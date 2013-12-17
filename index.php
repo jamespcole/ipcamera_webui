@@ -1,4 +1,5 @@
 <?
+	require_once('api/config.php');
 	$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') ? 'https://' : 'http://';
 	$base_url = $protocol.$_SERVER['HTTP_HOST'].str_replace(basename(__FILE__), '', $_SERVER['PHP_SELF']);
 	define('BASE_URL', $base_url);

@@ -417,7 +417,7 @@ $( document ).ready(function() {
 		}
 		e.preventDefault();
 
-
+		$('.app-page.active-page').addClass('animated slideOutLeft');
 		History.pushState({page:href}, null, href);
 		//App.Router.route();
 	});

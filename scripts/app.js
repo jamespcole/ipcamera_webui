@@ -298,7 +298,26 @@ App.UI.Settings = {
 			App.changePage('settings');
 			App.setActiveNav('settings_link');
 		});
-	}/*,
+	},
+	userSettings: function() {
+		var source = $('#user_settings-template').html();
+		var template = Handlebars.compile(source);
+		var html = template({});
+		$('#user_settings').html(html);
+		App.changePage('user_settings');
+		App.setActiveNav('settings_link');
+	},
+
+	addMotionServer: function() {
+		var source = $('#edit_motion-template').html();
+		var template = Handlebars.compile(source);
+		var html = template({});
+		$('#edit_motion').html(html);
+		App.changePage('edit_motion');
+		App.setActiveNav('settings_link');
+	}
+
+	/*,
 
 	showConfigurationSaveSuccess: function(camera, is_new) {
 		camera['is_new'] = is_new;
@@ -321,7 +340,63 @@ App.UI.FirstRun = {
 		var html = template({});
 		$('#firstrun').html(html);
 		App.changePage('firstrun');
+		$('#firstrun').on('click', '.check-btn', function(e) {
+			App.UI.FirstRun.check();
+		});
 		//App.setActiveNav('settings_link');
+	},
+	check: function() {
+		$('#firstrun').html('Running Checks...');
+		App.UI.FirstRun.checkPrerequisites().then(function(data) {
+			console.log(data);
+			var source = $('#prerequisite_check-template').html();
+			var template = Handlebars.compile(source);
+			var html = template(data);
+			$('#firstrun').html(html);
+			$('#firstrun').on('click', '.try-again-btn', function(e) {
+				App.UI.FirstRun.check();
+			});
+			//App.UI.
+			/*$('#prerequisite_check').html(html);
+			console.log(html);
+			App.changePage('prerequisite_check');*/
+		});
+
+		//App.setActiveNav('settings_link');
+	},
+	checkPrerequisites: function() {
+		var dfd = new jQuery.Deferred();
+		$.get(App.API_URL + 'firstrun.php', {prerequisites_check: true }, function(data) {
+			dfd.resolve(data);
+		});
+		return dfd;
+	},
+	userSettings: function() {
+		var source = $('#user_settings-template').html();
+		var template = Handlebars.compile(source);
+		var html = template({});
+		$('#firstrun_user_settings').html(html);
+		$('#firstrun_user_settings .time_24').attr('checked','checked');
+		App.changePage('firstrun_user_settings');
+		App.setActiveNav('settings_link');
+	}
+};
+
+App.API = {
+	saveUserSettings: function(form_data) {
+		var dfd = new jQuery.Deferred();
+		$.post(App.API_URL + 'settings.php', form_data, function(data) {
+			dfd.resolve(data);
+		}).fail(function(data) {
+			if(data.responseJSON) {
+				dfd.reject(data.responseJSON);
+			}
+			else {
+				dfd.reject(data.responseText);
+				alert(data.responseText);
+			}
+		});
+		return dfd;
 	}
 };
 
@@ -398,6 +473,12 @@ function Router()  {
 			else if(page == 'settings') {
 				App.UI.Settings.showSettings();
 			}
+			else if(page == 'user_settings') {
+				App.UI.Settings.userSettings();
+			}
+			else if(page == 'firstrun_user_settings') {
+				App.UI.FirstRun.userSettings();
+			}
 			else if(page == 'edit_camera') {
 				if(bits.length > 1) {
 					App.showAddCamera(bits[1]);
@@ -409,6 +490,9 @@ function Router()  {
 			else if(page == 'add_camera') {
 				App.showAddCamera();
 			}
+			else if(page == 'check') {
+				App.UI.FirstRun.check();
+			}
 			else if(page == 'view_camera') {
 				if(bits.length > 1) {
 					App.renderCamera(bits[1]);
@@ -417,6 +501,9 @@ function Router()  {
 
 				}
 
+			}
+			else if(page == 'add_motion_server') {
+				App.UI.Settings.addMotionServer();
 			}
 			else {
 				App.renderCameras();
@@ -480,6 +567,39 @@ $( document ).ready(function() {
 		$('#edit_camera_base_url').val(url);
 
 		App.saveConfiguration($(this).serialize());
+	});
+
+	$(document).on('submit', '.user-settings-form', function( event ) {
+		event.preventDefault();
+		var url = App.getConfiguredCameraUrl();
+		//console.log(event.target);
+		//console.log('saving', url);
+		//$('#edit_image_url').val(App.getConfiguredCameraUrl() + $('#edit_camera_image').val());
+		//$('#edit_camera_base_url').val(url);
+
+		console.log($(event.target).serialize());
+		$(event.target).find('.form-group').removeClass('has-error');
+		$(event.target).find('.validation-message').html('').hide();
+
+		App.API.saveUserSettings($(event.target).serialize()).then(function(data) {
+			FIRST_RUN = false;
+		},
+		function(error_data) {
+			if(error_data.errors) {
+				for(var i = 0; i < error_data.errors.length; i++) {
+					var error = error_data.errors[i];
+					if(error.type == 'global') {
+						App.showGlobalError(error.message, error.reason);
+					}
+					else if(error.type == 'field') {
+						var form_element = $('.user-' + error.name + '-field');
+
+						form_element.addClass('has-error');
+						form_element.find('.validation-message').html(error.message).show();
+					}
+				}
+			}
+		});
 	});
 
 });

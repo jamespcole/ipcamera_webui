@@ -75,6 +75,18 @@
 		<div id="firstrun" class="app-page">
 
 		</div>
+		<div id="prerequisite_check" class="app-page">
+
+		</div>
+		<div id="user_settings" class="app-page">
+
+		</div>
+		<div id="firstrun_user_settings" class="app-page">
+
+		</div>
+		<div id="edit_motion" class="app-page">
+
+		</div>
 	</div>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
@@ -124,18 +136,10 @@
 			</div>
 		</div>
 	</script>
-	<script id="camera_list-template" type="text/x-handlebars-template">
-		<div class="row">
-			{{#each cameras}}
-				<div class="col-md-4">
-					<div class="well">
-						<h4 class="pull-left">{{name}}</h4><a href="<?=BASE_URL?>view_camera/{{id}}" class="btn btn-primary btn-sm pull-right camera-view-btn" data-camera-id="{{id}}">View</a>
-						<img src="{{image_url}}" class="img-thumbnail" id="image_{{id}}" />
-					</div>
-				</div>
-			{{/each}}
-		</div>
-	</script>
+	<? include('includes/ui/camera_list.php'); ?>
+	<? include('includes/ui/firstrun.php'); ?>
+	<? include('includes/ui/settings.php'); ?>
+	<? include('includes/ui/edit_motion.php'); ?>
 	 <script id="view_camera-template" type="text/x-handlebars-template">
 	    <div class="row well col-md-8 col-md-offset-2">
 			<div class="col-md-12">
@@ -278,28 +282,6 @@
 			</form>
 		</div>
 	</script>
-	<script id="settings-template" type="text/x-handlebars-template">
-		<div class="row col-sm-offset-2 col-sm-6">
-			<a href="<?=BASE_URL?>add_camera" class="btn btn-success new-camera-link"><span class="glyphicon glyphicon-plus-sign"></span> Add a new Camera</a>
-			<h2>Cameras</h2>
-			<table class="table">
-				<tbody>
-				{{#each cameras}}
-					<tr>
-						<td><img style="max-height:40px" src="{{image_url}}" class="img-thumbnail" /></td>
-						<td><h4>{{name}}</h4></td>
-						<td>
-							<div class="pull-right">
-								<a class="btn btn-danger delete-camera-link" data-camera-id="{{id}}">Delete</a>
-								<a href="<?=BASE_URL?>edit_camera/{{id}}" class="btn btn-primary edit-camera-link" data-camera-id="{{id}}">Edit</a>
-							</div>
-						</td>
-					</tr>
-				{{/each}}
-				</tbody>
-			</table>
-		</div>
-	</script>
 	<script id="command-template" type="text/x-handlebars-template">
 		<div class="command-form">
 			<div class="form-group">
@@ -337,14 +319,85 @@
 			</div>
 		</div>
 	</script>
-	<script id="firstrun-template" type="text/x-handlebars-template">
-		<div class="jumbotron">
-			<h1>Hi There!</h1>
-			<p>It looks like this is your first time running IP Cam Web UI</p>
-			<p>Because this is the first run of your new installation we just need to run through some basic configuration.</p>
+	<script id="prerequisite_check-template" type="text/x-handlebars-template">
+		<div class="col-md-offset-2 col-md-8">
+			<h1>Pre-flight Check</h1>
+			<p>Just checking that everything is configured ok</p>
+			{{#each checks}}
+				<div class="alert alert-{{result}}">
+					<strong>{{name}}</strong>
+					<p>{{description}}</p>
+					<p>{{resolution}}</p>
+				</div>
+			{{/each}}
+
 			<p>
-				<a class="btn btn-lg btn-primary" href="firstrun_user_settings" role="button">Get Started</a>
+				{{#if has_errors}}
+					<a class="btn btn-lg btn-danger pull-right try-again-btn" role="button">Try Again</a>
+				{{else}}
+					<a class="btn btn-lg btn-primary pull-right" href="firstrun_user_settings" role="button">Next</a>
+				{{/if}}
 			</p>
+		</div>
+	</script>
+	<script id="user_settings-template" type="text/x-handlebars-template">
+		<div class="col-md-offset-2 col-md-8">
+			<div class="col-md-12 form-heading">
+				<h1><span class="glyphicon glyphicon-user"></span> User Details</h1>
+				<hr class="col-md-8" />
+			</div>
+
+			<form role="form" class="form-horizontal user-settings-form">
+				<div class="form-group user-username-field">
+					<label for="user_name" class="col-sm-2 control-label">Username</label>
+					<div class="col-sm-5">
+						<input type="text" class="form-control" id="user_name" name="username" placeholder="User Name" value="{{username}}">
+					</div>
+					<span class="help-block validation-message col-sm-5" style="display:none;"></span>
+				</div>
+				<div class="form-group user-password-field">
+					<label for="user_password" class="col-sm-2 control-label">Password</label>
+					<div class="col-sm-5">
+						<input type="password" class="form-control" id="user_password" name="password" placeholder="Password" value="">
+					</div>
+					<span class="help-block validation-message col-sm-5" style="display:none;"></span>
+				</div>
+				<div class="form-group user-confirm_password-field">
+					<label for="confirm_password" class="col-sm-2 control-label">Confirm</label>
+					<div class="col-sm-5">
+						<input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Confirm Password" value="">
+					</div>
+					<span class="help-block validation-message col-sm-5" style="display:none;"></span>
+				</div>
+				<div class="form-group user-date_format-field">
+					<label class="col-sm-2 control-label">Date Format</label>
+					<div class="col-sm-5">
+						<select class="form-control command-icon-select" name="date_format">
+							<option value="DD/MM/YYYY">DD/MM/YYYY</option>
+							<option value="YYYY-MM-DD">YYYY-MM-DD</option>
+							<option value="MM/DD/YYYY">MM/DD/YYYY</option>
+						</select>
+					</div>
+					<span class="help-block validation-message col-sm-5" style="display:none;"></span>
+				</div>
+				<div class="form-group user-time_format-field">
+					<label class="col-sm-2 control-label">Time Format</label>
+					<div class="col-sm-5">
+						<label class="checkbox-inline">
+							<input type="radio" name="time_format" class="time_24" value="HH:mm">
+							24 Hour
+						</label>
+						<label class="checkbox-inline">
+							<input type="radio" name="time_format" class="time_12" value="hh:mmA">
+							12 Hour
+						</label>
+					</div>
+					<span class="help-block validation-message col-sm-5" style="display:none;"></span>
+				</div>
+				<p class="col-md-7">
+					<button type="submit" class="btn btn-primary pull-right">Save</button>
+				</p>
+			</form>
 		</div>
 	</script>
   </body>

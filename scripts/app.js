@@ -71,7 +71,7 @@ var App = {
 				type: 'DELETE',
 				success: function(result) {
 					console.log(result);
-					App.showSettings();
+					App.UI.Settings.showSettings();
 				}
 			}).fail(function(error) {
 				console.log(error);
@@ -135,19 +135,19 @@ var App = {
 		}
 	},
 
-	showSettings: function() {
+	/*showSettings: function() {
 		App.getCameras().then(function(cameras_data) {
 			var source = $('#settings-template').html();
 			var template = Handlebars.compile(source);
 			var data = {
 				cameras: cameras_data.cameras
-			}
+			};
 			var html = template(data);
 			$('#settings').html(html);
 			App.changePage('settings');
 			App.setActiveNav('settings_link');
 		});
-	},
+	},*/
 
 	changePage: function(page_name) {
 		App.showGlobalError(null, null, false);
@@ -277,6 +277,55 @@ var App = {
 	}
 };
 
+App.UI = {
+
+};
+
+App.UI.Settings = {
+	initialise: function() {
+
+	},
+
+	showSettings: function() {
+		App.getCameras().then(function(cameras_data) {
+			var source = $('#settings-template').html();
+			var template = Handlebars.compile(source);
+			var data = {
+				cameras: cameras_data.cameras
+			};
+			var html = template(data);
+			$('#settings').html(html);
+			App.changePage('settings');
+			App.setActiveNav('settings_link');
+		});
+	}/*,
+
+	showConfigurationSaveSuccess: function(camera, is_new) {
+		camera['is_new'] = is_new;
+		var source = $('#save_success-template').html();
+		var template = Handlebars.compile(source);
+		var html = template(camera);
+		$('#save_success').html(html);
+		App.changePage('save_success');
+		App.setActiveNav('settings_link');
+	}*/
+};
+
+App.UI.FirstRun = {
+	initialise: function() {
+
+	},
+	show: function() {
+		var source = $('#firstrun-template').html();
+		var template = Handlebars.compile(source);
+		var html = template({});
+		$('#firstrun').html(html);
+		App.changePage('firstrun');
+		//App.setActiveNav('settings_link');
+	}
+};
+
+
 function CameraUpdater(params)  {
 	this.element = params.element;
 	this.url = params.url;
@@ -333,7 +382,12 @@ function Router()  {
 		var bits = url_data.split('/');
 		//console.log(bits);
 		if(bits.length == 0 || bits[0] == '' || bits[0] == '/') {
-			App.renderCameras();
+			if(FIRST_RUN) {
+				App.UI.FirstRun.show();
+			}
+			else {
+				App.renderCameras();
+			}
 		}
 		else {
 			var page = bits[0];
@@ -342,7 +396,7 @@ function Router()  {
 				App.renderCameras();
 			}
 			else if(page == 'settings') {
-				App.showSettings();
+				App.UI.Settings.showSettings();
 			}
 			else if(page == 'edit_camera') {
 				if(bits.length > 1) {
@@ -369,7 +423,7 @@ function Router()  {
 			}
 		}
 	}
-};
+}
 
 $( document ).ready(function() {
 	App.Router = new Router();
@@ -385,9 +439,6 @@ $( document ).ready(function() {
 		var State = History.getState();
 		App.Router.route();
 	});
-
-	//history.pushState({page:'home'}, null, BASE_URL);
-	//App.Router.route();
 
 	$(document).on('click', '.delete-camera-link', function(e) {
 		var camera_id = $(this).data('camera-id');
@@ -412,14 +463,13 @@ $( document ).ready(function() {
 		if(!href) {
 			return;
 		}
-		if(href.indexOf(BASE_URL) != 0) {
+		if(href.indexOf(BASE_URL) !== 0) {
 			return;
 		}
 		e.preventDefault();
 
 		$('.app-page.active-page').addClass('animated slideOutLeft');
 		History.pushState({page:href}, null, href);
-		//App.Router.route();
 	});
 
 	$(document).on('submit', '#configuration_form', function( event ) {
@@ -428,7 +478,6 @@ $( document ).ready(function() {
 		console.log('saving', url);
 		$('#edit_image_url').val(App.getConfiguredCameraUrl() + $('#edit_camera_image').val());
 		$('#edit_camera_base_url').val(url);
-		//console.log( $( this ).serialize() );
 
 		App.saveConfiguration($(this).serialize());
 	});

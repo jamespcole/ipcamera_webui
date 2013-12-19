@@ -1,8 +1,10 @@
 <?
 	require_once('api/config.php');
 	$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') ? 'https://' : 'http://';
-	$base_url = $protocol.$_SERVER['HTTP_HOST'].str_replace(basename(__FILE__), '', $_SERVER['PHP_SELF']);
+	$port = (!empty($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] != 80) ? ':'.$_SERVER['SERVER_PORT'] : '';
+	$base_url = $protocol.$_SERVER['HTTP_HOST'].$port.str_replace(basename(__FILE__), '', $_SERVER['PHP_SELF']);
 	define('BASE_URL', $base_url);
+	//print_r($_SERVER);
 	//echo BASE_URL;
 ?>
 <!DOCTYPE html>
@@ -18,6 +20,7 @@
 
     <script type="text/javascript">
     var BASE_URL = '<?=BASE_URL?>';
+    var FIRST_RUN = <?=json_encode(FIRST_RUN)?>;
     </script>
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -67,6 +70,9 @@
 
 		</div>
 		<div id="save_success" class="app-page">
+
+		</div>
+		<div id="firstrun" class="app-page">
 
 		</div>
 	</div>
@@ -329,6 +335,16 @@
 				</div>
 				<span class="help-block validation-message col-sm-5" style="display:none;"></span>
 			</div>
+		</div>
+	</script>
+	<script id="firstrun-template" type="text/x-handlebars-template">
+		<div class="jumbotron">
+			<h1>Hi There!</h1>
+			<p>It looks like this is your first time running IP Cam Web UI</p>
+			<p>Because this is the first run of your new installation we just need to run through some basic configuration.</p>
+			<p>
+				<a class="btn btn-lg btn-primary" href="firstrun_user_settings" role="button">Get Started</a>
+			</p>
 		</div>
 	</script>
   </body>

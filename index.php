@@ -3,7 +3,7 @@
 	$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') ? 'https://' : 'http://';
 	$port = (!empty($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] != 80) ? ':'.$_SERVER['SERVER_PORT'] : '';
 	$base_url = $protocol.$_SERVER['HTTP_HOST'].$port.str_replace(basename(__FILE__), '', $_SERVER['PHP_SELF']);
-	define('BASE_URL', $base_url);
+	//define('BASE_URL', $base_url);
 	//print_r($_SERVER);
 	//echo BASE_URL;
 ?>
@@ -87,6 +87,9 @@
 		<div id="edit_motion" class="app-page">
 
 		</div>
+		<div id="import_motion_cameras" class="app-page">
+
+		</div>
 	</div>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
@@ -96,6 +99,7 @@
 
     <script src="<?=BASE_URL?>scripts/handlebars-v1.1.2.js"></script>
     <script src="<?=BASE_URL?>scripts/app.js"></script>
+     <script src="<?=BASE_URL?>scripts/ui/settings.js"></script>
     <script src="<?=BASE_URL?>scripts/jquery.history.js"></script>
 
     <script id="global_error-template" type="text/x-handlebars-template">
@@ -140,6 +144,7 @@
 	<? include('includes/ui/firstrun.php'); ?>
 	<? include('includes/ui/settings.php'); ?>
 	<? include('includes/ui/edit_motion.php'); ?>
+	<? include('includes/ui/import_motion_cameras.php'); ?>
 	 <script id="view_camera-template" type="text/x-handlebars-template">
 	    <div class="row well col-md-8 col-md-offset-2">
 			<div class="col-md-12">
@@ -173,6 +178,9 @@
 				<input type="hidden" id="edit_image_url" name="image_url" />
 				<input type="hidden" id="edit_camera_id" name="id" value="{{id}}" />
 				<input type="hidden" id="edit_camera_base_url" name="base_url" value="{{base_url}}" />
+				<input type="hidden" id="edit_camera_is_motion_stream" name="is_motion_stream" value="{{is_motion_stream}}" />
+				<input type="hidden" id="edit_camera_motion_id" name="motion_id" value="{{motion_id}}" />
+				<input type="hidden" id="edit_camera_thread_number" name="thread_number" value="{{thread_number}}" />
 				<div class="form-group camera-name-field">
 					<label for="edit_camera_name" class="col-sm-2 control-label">Name</label>
 					<div class="col-sm-5">

@@ -5,9 +5,33 @@
 	//for testing configuration before saving
 	if(isset($_GET['configuration_test'])) {
 		if(isset($_GET['test_url'])) {
-			$realpath = $_GET['test_url'];
-			header("Content-Type: image/jpeg");
-			echo file_get_contents($realpath);
+			if(!empty($_GET['is_stream']) && $_GET['is_stream'] == 'true') //to get still from motion stream
+			{
+				$boundary="\n--";
+				$f = fopen($_GET['test_url'],"r") ;
+				if(!$f) {
+					echo "error";
+				}
+				else {
+					$r = '';
+					//**** URL OK
+					while (substr_count($r,"Content-Length") != 2) $r.=fread($f,512);
+
+					$start = strpos($r,"\xff");
+					$end   = strpos($r,$boundary,$start)-1;
+					$frame = substr("$r",$start,$end - $start);
+
+					header("Content-type: image/jpeg");
+					echo $frame;
+				}
+				fclose($f);
+				die();
+			}
+			else {
+				$realpath = $_GET['test_url'];
+				header("Content-Type: image/jpeg");
+				echo file_get_contents($realpath);
+			}
 		}
 
 	}

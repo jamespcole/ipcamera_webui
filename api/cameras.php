@@ -1,10 +1,11 @@
 <?
 require_once('config.php');
+require_once('motion_functions.php');
 
-$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') ? 'https://' : 'http://';
-$base_url = $protocol.$_SERVER['HTTP_HOST'].str_replace('api/'.basename(__FILE__), '', $_SERVER['PHP_SELF']);
-//echo $base_url;
-define('BASE_URL', $base_url);
+// $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') ? 'https://' : 'http://';
+// $base_url = $protocol.$_SERVER['HTTP_HOST'].str_replace('api/'.basename(__FILE__), '', $_SERVER['PHP_SELF']);
+// //echo $base_url;
+// define('BASE_URL', $base_url);
 
 $path = CAMERA_DATA_PATH.'/';
 
@@ -32,6 +33,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	$camera_data->port = $_POST['port'];
 	$camera_data->camera_image = $_POST['camera_image'];
 	$camera_data->base_url = $_POST['base_url'];
+	$camera_data->motion_id = $_POST['motion_id'];
+	$camera_data->thread_number = $_POST['thread_number'];
 
 	if(isset($_POST['proxy_data']) && $_POST['proxy_data'] == 'on') {
 		$camera_data->image_url = 'api/image_proxy.php?camera_id='.$new_id;
@@ -57,6 +60,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 			$count++;
 		}
 		$camera_data->commands = $commands;
+	}
+
+	//update motion
+	if($camera_data->motion_id) {
+		$motion_data = loadMotionData($camera_data->motion_id);
+		setConfigValue($motion_data, $camera_data->thread_number, 'target_dir', CAMERA_DATA_PATH.'/'.$camera_data->id.'/history');
+		setConfigValue($motion_data, $camera_data->thread_number, 'snapshot_filename', urlencode('%Y-%m-%d/%v/%v_%Y-%m-%d_%H-%M-%S-snapshot'));
+		setConfigValue($motion_data, $camera_data->thread_number, 'jpeg_filename',  urlencode('%Y-%m-%d/%v/%v_%Y-%m-%d_%H-%M-%S_%q'));
+		setConfigValue($motion_data, $camera_data->thread_number, 'movie_filename',  urlencode('%Y-%m-%d/%v/%v_%Y-%m-%d_%H-%M-%S'));
+
+		writeConfigValue($motion_data, $camera_data->thread_number);
 	}
 
 	header('Content-Type: application/json');

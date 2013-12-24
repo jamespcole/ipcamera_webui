@@ -79,7 +79,7 @@ var App = {
 		}
 	},
 
-	showAddCamera: function(camera_id) {
+	showAddCamera: function(camera_id, motion_id, thread_number) {
 		if(camera_id) {
 			App.getCamera(camera_id).then(function(data) {
 				var camera = data.camera;
@@ -96,6 +96,27 @@ var App = {
 						App.addCommandForm(command, i);
 					}
 				}
+				App.changePage('add_camera');
+				App.setActiveNav('settings_link');
+			});
+		}
+		if(motion_id && thread_number !== null) {
+			App.API.Motion.getThread(motion_id, thread_number).then(function(data) {
+				var camera = data.thread;
+				var source = $('#add_camera-template').html();
+				var template = Handlebars.compile(source);
+				var html = template(camera);
+				$('#add_camera').html(html);
+				if(camera.proxy_data === true) {
+					$('#edit_proxy_data').attr('checked', 'checked');
+				}
+				if(camera.commands) {
+					for(var i = 0; i < camera.commands.length; i++) {
+						var command = camera.commands[i];
+						App.addCommandForm(command, i);
+					}
+				}
+				$('#edit_proxy_data').attr('checked', 'checked');
 				App.changePage('add_camera');
 				App.setActiveNav('settings_link');
 			});
@@ -281,54 +302,7 @@ App.UI = {
 
 };
 
-App.UI.Settings = {
-	initialise: function() {
 
-	},
-
-	showSettings: function() {
-		App.getCameras().then(function(cameras_data) {
-			var source = $('#settings-template').html();
-			var template = Handlebars.compile(source);
-			var data = {
-				cameras: cameras_data.cameras
-			};
-			var html = template(data);
-			$('#settings').html(html);
-			App.changePage('settings');
-			App.setActiveNav('settings_link');
-		});
-	},
-	userSettings: function() {
-		var source = $('#user_settings-template').html();
-		var template = Handlebars.compile(source);
-		var html = template({});
-		$('#user_settings').html(html);
-		App.changePage('user_settings');
-		App.setActiveNav('settings_link');
-	},
-
-	addMotionServer: function() {
-		var source = $('#edit_motion-template').html();
-		var template = Handlebars.compile(source);
-		var html = template({});
-		$('#edit_motion').html(html);
-		App.changePage('edit_motion');
-		App.setActiveNav('settings_link');
-	}
-
-	/*,
-
-	showConfigurationSaveSuccess: function(camera, is_new) {
-		camera['is_new'] = is_new;
-		var source = $('#save_success-template').html();
-		var template = Handlebars.compile(source);
-		var html = template(camera);
-		$('#save_success').html(html);
-		App.changePage('save_success');
-		App.setActiveNav('settings_link');
-	}*/
-};
 
 App.UI.FirstRun = {
 	initialise: function() {
@@ -386,6 +360,72 @@ App.API = {
 	saveUserSettings: function(form_data) {
 		var dfd = new jQuery.Deferred();
 		$.post(App.API_URL + 'settings.php', form_data, function(data) {
+			dfd.resolve(data);
+		}).fail(function(data) {
+			if(data.responseJSON) {
+				dfd.reject(data.responseJSON);
+			}
+			else {
+				dfd.reject(data.responseText);
+				alert(data.responseText);
+			}
+		});
+		return dfd;
+	}
+};
+
+App.API.Motion = {
+	testServer: function(url) {
+		var dfd = new jQuery.Deferred();
+		$.get(App.API_URL + 'motion.php', {action: 'test_config', test_url: url}, function(data) {
+			dfd.resolve(data);
+		}).fail(function(data) {
+			if(data.responseJSON) {
+				dfd.reject(data.responseJSON);
+			}
+			else {
+				dfd.reject(data.responseText);
+				alert(data.responseText);
+			}
+		});
+		return dfd;
+	},
+
+	saveConfigurationSettings: function(form_data) {
+		var dfd = new jQuery.Deferred();
+		$.post(App.API_URL + 'motion.php', form_data, function(data) {
+			dfd.resolve(data);
+		}).fail(function(data) {
+			if(data.responseJSON) {
+				dfd.reject(data.responseJSON);
+			}
+			else {
+				dfd.reject(data.responseText);
+				alert(data.responseText);
+			}
+		});
+		return dfd;
+	},
+
+	getThreads: function(motion_id) {
+		var dfd = new jQuery.Deferred();
+		$.get(App.API_URL + 'motion.php',  {action: 'get_motion_threads', motion_id: motion_id}, function(data) {
+			dfd.resolve(data);
+		}).fail(function(data) {
+			if(data.responseJSON) {
+				dfd.reject(data.responseJSON);
+			}
+			else {
+				dfd.reject(data.responseText);
+				alert(data.responseText);
+			}
+		});
+		return dfd;
+	},
+
+	getThread: function(motion_id, thread_number) {
+		var dfd = new jQuery.Deferred();
+		$.get(App.API_URL + 'motion.php',  {action: 'get_motion_thread', motion_id: motion_id, thread_number: thread_number}, function(data) {
 			dfd.resolve(data);
 		}).fail(function(data) {
 			if(data.responseJSON) {
@@ -487,6 +527,14 @@ function Router()  {
 					App.showAddCamera();
 				}
 			}
+			else if(page == 'import_camera') {
+				if(bits.length > 1) {
+					App.showAddCamera(null, bits[1], bits[2]);
+				}
+				else {
+					App.showAddCamera();
+				}
+			}
 			else if(page == 'add_camera') {
 				App.showAddCamera();
 			}
@@ -496,6 +544,15 @@ function Router()  {
 			else if(page == 'view_camera') {
 				if(bits.length > 1) {
 					App.renderCamera(bits[1]);
+				}
+				else {
+
+				}
+
+			}
+			else if(page == 'import_motion_cameras') {
+				if(bits.length > 1) {
+					App.UI.Settings.importMotionCameras(bits[1]);
 				}
 				else {
 
@@ -583,6 +640,7 @@ $( document ).ready(function() {
 
 		App.API.saveUserSettings($(event.target).serialize()).then(function(data) {
 			FIRST_RUN = false;
+			History.pushState({page:'camera_list'}, null, 'camera_list');
 		},
 		function(error_data) {
 			if(error_data.errors) {
@@ -601,5 +659,41 @@ $( document ).ready(function() {
 			}
 		});
 	});
+
+
+	$(document).on('click', '#edit_motion .test_config_btn', function( event ) {
+		App.UI.Settings.testMotionSettings();
+	});
+
+	$(document).on('submit', '.edit_motion_form', function( event ) {
+		event.preventDefault();
+		var url = App.UI.Settings.getConfiguredMotionUrl();
+		$('.edit_motion_form #edit_motion_url').val(url);
+		/*console.log('saving', url);
+		$('#edit_image_url').val(App.getConfiguredCameraUrl() + $('#edit_camera_image').val());
+		$('#edit_camera_base_url').val(url);*/
+		console.log($(event.target).serialize());
+		App.API.Motion.saveConfigurationSettings($(this).serialize()).then(function(data) {
+			console.log(data);
+			History.pushState({page:'import_motion_cameras/' + data.id}, null, 'import_motion_cameras/' + data.id);
+		},
+		function(error_data) {
+			if(error_data.errors) {
+				for(var i = 0; i < error_data.errors.length; i++) {
+					var error = error_data.errors[i];
+					if(error.type == 'global') {
+						App.showGlobalError(error.message, error.reason);
+					}
+					else if(error.type == 'field') {
+						var form_element = $('.motion-' + error.name + '-field');
+
+						form_element.addClass('has-error');
+						form_element.find('.validation-message').html(error.message).show();
+					}
+				}
+			}
+		});
+	});
+
 
 });

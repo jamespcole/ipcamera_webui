@@ -1,36 +1,6 @@
 <?
-
-// $camurl="http://admin:w1llows1@127.0.0.1:8081";
-
-// $boundary="\n--";
-
-// $f = fopen($camurl,"r") ;
-
-//    if(!$f)
-//    {
-//         //**** cannot open
-//         echo "error";
-//    }
-//     else
-//   {
-//   		$r = '';
-//         //**** URL OK
-//          while (substr_count($r,"Content-Length") != 2) $r.=fread($f,512);
-
-//          $start = strpos($r,"\xff");
-//          $end   = strpos($r,$boundary,$start)-1;
-//          $frame = substr("$r",$start,$end - $start);
-
-//          header("Content-type: image/jpeg");
-//          echo $frame;
-
-//    }
-
-
-// fclose($f);
-// die();
-
 	require_once('config.php');
+	require_once('security.php');
 	require_once('motion_functions.php');
 	header('Content-Type: application/json');
 
@@ -67,6 +37,46 @@
 				header("HTTP/1.1 403 Unauthorized" );
 			}
 			echo json_encode($results);
+		}
+
+		if(!empty($_GET['action']) && $_GET['action'] == 'get_motion_servers') {
+			$contents = scandir($path);
+			$result['motion_servers'] = array();
+			foreach($contents as $item) {
+
+				if($item == '.' || $item == '..') {
+					continue;
+				}
+				if(is_dir($path.$item)) {
+					$json_file = $path.$item.'/server.json';
+					if(file_exists($json_file)) {
+						$motion_data = json_decode(file_get_contents($json_file));
+						$motion_data->id = $item;
+						array_push($result['motion_servers'], $motion_data);
+						//echo $camera_data;
+					}
+				}
+			}
+			echo json_encode($result);
+			die();
+		}
+
+		if(!empty($_GET['action']) && $_GET['action'] == 'get_motion_server') {
+			$result = array();
+			try {
+				$motion_id = (!empty($_GET['motion_id'])) ? $_GET['motion_id'] : '';
+				if(!$motion_id) {
+					throw new Exception('No motion id was passed.');
+				}
+				$result = loadMotionData($motion_id);
+			}
+			catch(Exception $ex) {
+				$result['result'] = 'error';
+				$result['message'] = $ex->getMessage();
+				header("HTTP/1.1 403 Unauthorized" );
+			}
+			echo json_encode($result);
+			die();
 		}
 
 		if(!empty($_GET['action']) && $_GET['action'] == 'get_motion_threads') {
@@ -110,8 +120,9 @@
 						$url .=  $motion_data->server.':'.$thread_data['webcam_port'];
 						$thread['number'] = $num;
 						$thread['motion_id'] = $motion_data->id;
-						$thread['image'] = $url;
-						$thread['test_image'] = BASE_URL.'api/image_proxy.php?configuration_test=true&is_stream=true&test_url='.urlencode($url);
+						//$thread['image'] = $url;
+						//$thread['test_image'] = BASE_URL.'api/image_proxy.php?configuration_test=true&is_stream=true&test_url='.urlencode($url);
+						$thread['image'] = BASE_URL.'api/image_proxy.php?configuration_test=true&is_stream=true&test_url='.urlencode($url);
 						array_push($threads, $thread);
 					}
 				}
@@ -119,6 +130,18 @@
 				$results['result'] = 'ok';
 				$results['message'] = 'Motion server contacted successfully';
 				$results['threads'] = $threads;
+
+				$config_ok = checkMainConfigWriteable();
+				$config_check = array();
+				$config_check['can_write'] = $config_ok;
+				if($config_ok) {
+					$config_check['message'] = 'Main config file is writable.';
+				}
+				else {
+					$config_check['message'] = 'Main config file is not writable.';
+				}
+				$results['config_check'] = $config_check;
+
 			}
 			catch(Exception $ex) {
 				$results['result'] = 'error';
@@ -256,6 +279,28 @@
 			die();
 		}
 	}
+
+	if($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+		$result = array();
+		if(isset($_GET['motion_id'])) {
+			$id = $_GET['motion_id'];
+			if(!rrmdir($path.$id)) {
+				header("HTTP/1.1 403 Unauthorized" );
+				$result['errors'] = array('type' => 'global', 'message' => 'Could not delete motion server', 'reason' => 'The motion server configuration could not be deleted.');
+			}
+			else {
+				$result['message'] = 'Camera deleted successfully';
+			}
+		}
+		else {
+			header("HTTP/1.1 403 Unauthorized" );
+			$result['errors'] = array('type' => 'global', 'message' => 'Could not delete motion server', 'reason' => 'No motion server id was passed in to the API.');
+		}
+		header('Content-Type: application/json');
+		$json_data = json_encode($result);
+		echo $json_data;
+		die();
+	}
 	//echo file_get_contents('http://192.168.1.250:8080/0/config/list');
 
 	function validate() {
@@ -296,5 +341,17 @@
 			return $result;
 		}
 		return TRUE;
+	}
+
+	function rrmdir($dir) {
+		foreach(glob($dir . '/*') as $file) {
+			if(is_dir($file)) {
+				rrmdir($file);
+			}
+			else {
+				unlink($file);
+			}
+		}
+		return rmdir($dir);
 	}
 ?>

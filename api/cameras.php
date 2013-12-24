@@ -1,11 +1,7 @@
 <?
 require_once('config.php');
+require_once('security.php');
 require_once('motion_functions.php');
-
-// $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') ? 'https://' : 'http://';
-// $base_url = $protocol.$_SERVER['HTTP_HOST'].str_replace('api/'.basename(__FILE__), '', $_SERVER['PHP_SELF']);
-// //echo $base_url;
-// define('BASE_URL', $base_url);
 
 $path = CAMERA_DATA_PATH.'/';
 

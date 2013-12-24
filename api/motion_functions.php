@@ -44,4 +44,11 @@
 		return $data;
 	}
 
+	function checkMainConfigWriteable() {
+		if(!is_writable('/etc/motion/motion.conf')) {
+			return FALSE;
+		}
+		return TRUE;
+	}
+
 ?>

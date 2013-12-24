@@ -4,25 +4,58 @@ App.UI.Settings = {
 	},
 
 	showSettings: function() {
-		App.getCameras().then(function(cameras_data) {
+		//App.API.Cameras.getCameras().then(function(cameras_data) {
 			var source = $('#settings-template').html();
 			var template = Handlebars.compile(source);
-			var data = {
-				cameras: cameras_data.cameras
-			};
-			var html = template(data);
+
+			var html = template({});
 			$('#settings').html(html);
 			App.changePage('settings');
 			App.setActiveNav('settings_link');
-		});
+		//});
 	},
 	userSettings: function() {
-		var source = $('#user_settings-template').html();
-		var template = Handlebars.compile(source);
-		var html = template({});
-		$('#user_settings').html(html);
-		App.changePage('user_settings');
-		App.setActiveNav('settings_link');
+		if(FIRST_RUN === true) {
+			var source = $('#user_settings-template').html();
+			var template = Handlebars.compile(source);
+			var html = template({});
+			$('#user_settings').html(html);
+			$('#user_settings .time_24').attr('checked','checked');
+			App.changePage('user_settings');
+			App.setActiveNav('settings_link');
+		}
+		else {
+			App.API.Settings.getUserSettings().then(function(data) {
+				var source = $('#user_settings-template').html();
+				var template = Handlebars.compile(source);
+				var html = template(data);
+				$('#user_settings').html(html);
+				if(data.time_format == 'HH:mm') {
+					$('#user_settings .time_24').attr('checked','checked');
+				}
+				else {
+					$('#user_settings .time_12').attr('checked','checked');
+				}
+				$('#user_settings .date-format-select').val(data.date_format);
+
+				App.changePage('user_settings');
+				App.setActiveNav('settings_link');
+			},
+			function(error) {
+				App.changePage('user_settings');
+				App.setActiveNav('settings_link');
+				if(error.message) {
+					App.showGlobalError("Could not connect to server", error.message, true);
+				}
+				else {
+					App.showGlobalError("Could not connect to server", "An error occurred while trying to communicate with the server.", true);
+				}
+				$('#user_settings').html('');
+
+
+			});
+		}
+
 	},
 
 	addMotionServer: function() {
@@ -32,6 +65,30 @@ App.UI.Settings = {
 		$('#edit_motion').html(html);
 		App.changePage('edit_motion');
 		App.setActiveNav('settings_link');
+	},
+
+	editMotionServer: function(motion_id) {
+		App.API.Motion.getMotionServer(motion_id).then(function(data) {
+			var source = $('#edit_motion-template').html();
+			var template = Handlebars.compile(source);
+			var html = template(data);
+			$('#edit_motion').html(html);
+			App.changePage('edit_motion');
+			App.setActiveNav('settings_link');
+		},
+		function(error) {
+			App.changePage('edit_motion');
+			App.setActiveNav('settings_link');
+			if(error.message) {
+				App.showGlobalError("Could not connect to server", error.message, true);
+			}
+			else {
+				App.showGlobalError("Could not connect to server", "An error occurred while trying to communicate with the server.", true);
+			}
+			$('#edit_motion').html('');
+
+
+		});
 	},
 
 	testMotionSettings: function() {
@@ -59,7 +116,7 @@ App.UI.Settings = {
 			url += username + ':' + password + '@';
 		}
 		url += server + ':' + port;
-		console.log(url);
+		//console.log(url);
 		return url;
 	},
 
@@ -72,6 +129,68 @@ App.UI.Settings = {
 			$('#import_motion_cameras').html(html);
 			App.changePage('import_motion_cameras');
 			App.setActiveNav('settings_link');
+		},
+		function(error) {
+			App.changePage('import_motion_cameras');
+			App.setActiveNav('settings_link');
+			if(error.message) {
+				App.showGlobalError("Could not connect to motion server", error.message, true);
+			}
+			else {
+				App.showGlobalError("Could not connect to motion server", "An error occurred while trying to communicate with the motion server.", true);
+			}
+			$('#import_motion_cameras').html('');
+		});
+	},
+
+	showMotionServers: function() {
+		App.API.Motion.getMotionServers().then(function(data) {
+			if(data.motion_servers.length === 0) {
+				History.pushState({page:'add_motion_server'}, null, 'add_motion_server');
+			}
+			else {
+				var source = $('#motion_servers-template').html();
+				var template = Handlebars.compile(source);
+				var html = template(data);
+				$('#motion_servers').html(html);
+				App.changePage('motion_servers');
+				App.setActiveNav('settings_link');
+			}
+		},
+		function(error) {
+			App.changePage('motion_servers');
+			App.setActiveNav('settings_link');
+			if(error.message) {
+				App.showGlobalError("Could not connect to API", error.message, true);
+			}
+			else {
+				App.showGlobalError("Could not connect to API", "An error occurred while trying to communicate with the API.", true);
+			}
+			$('#motion_servers').html('');
+
+		});
+	},
+
+	showCameras: function() {
+		App.API.Cameras.getCameras().then(function(data) {
+			var source = $('#cameras-template').html();
+			var template = Handlebars.compile(source);
+			var html = template(data);
+			$('#cameras').html(html);
+			App.changePage('cameras');
+			App.setActiveNav('settings_link');
+		},
+		function(error) {
+			App.changePage('cameras');
+			App.setActiveNav('settings_link');
+			if(error.message) {
+				App.showGlobalError("Could not connect to API", error.message, true);
+			}
+			else {
+				App.showGlobalError("Could not connect to API", "An error occurred while trying to communicate with the API.", true);
+			}
+			$('#cameras').html('');
+
 		});
 	}
 
@@ -87,3 +206,56 @@ App.UI.Settings = {
 		App.setActiveNav('settings_link');
 	}*/
 };
+
+
+$( document ).ready(function() {
+
+	$(document).on('click', '#edit_motion .test_config_btn', function( event ) {
+		App.UI.Settings.testMotionSettings();
+	});
+
+	$(document).on('click', '.delete-motion-server-link', function(e) {
+		var motion_id = $(this).data('motion-id');
+		if(confirm('Are you sure you want to delete this motion server?')) {
+			App.API.Motion.deleteMotionServer(motion_id).then(function(data) {
+				App.UI.Settings.showMotionServers();
+			},
+			function(error) {
+				console.log(error);
+			});
+		}
+	});
+
+	$(document).on('submit', '.edit_motion_form', function( event ) {
+		event.preventDefault();
+		var url = App.UI.Settings.getConfiguredMotionUrl();
+		$('.edit_motion_form #edit_motion_url').val(url);
+		console.log($(event.target).serialize());
+		App.API.Motion.saveConfigurationSettings($(this).serialize()).then(function(data) {
+			if($('.edit_motion_form #edit_motion_id').val()) {
+				History.pushState({page:'motion_servers'}, null, 'motion_servers');
+			}
+			else {
+				History.pushState({page:'import_motion_cameras/' + data.id}, null, 'import_motion_cameras/' + data.id);
+			}
+		},
+		function(error_data) {
+			if(error_data.errors) {
+				for(var i = 0; i < error_data.errors.length; i++) {
+					var error = error_data.errors[i];
+					if(error.type == 'global') {
+						App.showGlobalError(error.message, error.reason);
+					}
+					else if(error.type == 'field') {
+						var form_element = $('.motion-' + error.name + '-field');
+
+						form_element.addClass('has-error');
+						form_element.find('.validation-message').html(error.message).show();
+					}
+				}
+			}
+		});
+	});
+
+
+});

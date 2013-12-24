@@ -2,17 +2,9 @@ var App = {
 	API_URL: BASE_URL + 'api/',
 	camera_updaters: [],
 
-	getCameras: function() {
-		var dfd = new jQuery.Deferred();
-		$.get(App.API_URL + 'cameras.php', function(data) {
-			dfd.resolve(data);
-		});
-		return dfd;
-	},
-
 	renderCameras: function() {
 
-		App.getCameras().then(function(data) {
+		App.API.Cameras.getCameras().then(function(data) {
 			var source   = $("#camera_list-template").html();
 			var template = Handlebars.compile(source);
 			var html    = template(data);
@@ -79,110 +71,13 @@ var App = {
 		}
 	},
 
-	showAddCamera: function(camera_id, motion_id, thread_number) {
-		if(camera_id) {
-			App.getCamera(camera_id).then(function(data) {
-				var camera = data.camera;
-				var source = $('#add_camera-template').html();
-				var template = Handlebars.compile(source);
-				var html = template(camera);
-				$('#add_camera').html(html);
-				if(camera.proxy_data === true) {
-					$('#edit_proxy_data').attr('checked', 'checked');
-				}
-				if(camera.commands) {
-					for(var i = 0; i < camera.commands.length; i++) {
-						var command = camera.commands[i];
-						App.addCommandForm(command, i);
-					}
-				}
-				App.changePage('add_camera');
-				App.setActiveNav('settings_link');
-			});
-		}
-		if(motion_id && thread_number !== null) {
-			App.API.Motion.getThread(motion_id, thread_number).then(function(data) {
-				var camera = data.thread;
-				var source = $('#add_camera-template').html();
-				var template = Handlebars.compile(source);
-				var html = template(camera);
-				$('#add_camera').html(html);
-				if(camera.proxy_data === true) {
-					$('#edit_proxy_data').attr('checked', 'checked');
-				}
-				if(camera.commands) {
-					for(var i = 0; i < camera.commands.length; i++) {
-						var command = camera.commands[i];
-						App.addCommandForm(command, i);
-					}
-				}
-				$('#edit_proxy_data').attr('checked', 'checked');
-				App.changePage('add_camera');
-				App.setActiveNav('settings_link');
-			});
-		}
-		else {
-			var source = $('#add_camera-template').html();
-			var template = Handlebars.compile(source);
-			var html = template({port: 80});
-			$('#add_camera').html(html);
-			$('#edit_proxy_data').attr('checked', 'checked');
-			App.changePage('add_camera');
-			App.setActiveNav('settings_link');
-		}
-		//App.getCameras().then(function(data) {
-
-		//});
-	},
-
-	addCommandForm: function(command, index) {
-		var source = $('#command-template').html();
-		var template = Handlebars.compile(source);
-		if(!command) {
-			command = {};
-		}
-		if(!index) {
-			index = $('.command-form').length;
-		}
-		command['command_index'] = index;
-		command['command_display_index'] = index + 1;
-
-		var html = template(command);
-
-		$('#command_list').append(html);
-		var icon_select = $('#command_list .command-icon-select')[index];
-		if(command.command_icon) {
-			$(icon_select).val(command.command_icon);
-		}
-	},
-
-	/*showSettings: function() {
-		App.getCameras().then(function(cameras_data) {
-			var source = $('#settings-template').html();
-			var template = Handlebars.compile(source);
-			var data = {
-				cameras: cameras_data.cameras
-			};
-			var html = template(data);
-			$('#settings').html(html);
-			App.changePage('settings');
-			App.setActiveNav('settings_link');
-		});
-	},*/
-
 	changePage: function(page_name) {
 		App.showGlobalError(null, null, false);
 		$('.app-page').removeClass('active-page').hide();
-		//$('.app-page:not(.active-page)').hide();
-		//$('.app-page.active-page').removeClass('active-page').addClass('animated slideOutLeft').hide();
-		/*$('.app-page:not(.active-page)').hide();
-		$('.app-page.active-page').removeClass('active-page').slideUp(function() {
-			$('#' + page_name).show().addClass('animated slideInRight active-page');
-		});*/
-		//$('.app-page').addClass('animated slideOutRight');
-		//$('#' + page_name).show();
 		$('#' + page_name).show().removeClass('animated slideOutLeft').addClass('animated slideInRight active-page');
-		//History.pushState({}, page_name, page_name);
+		if($('#main_nav').is(':visible')) {
+			$('#main_nav').collapse('hide');
+		}
 	},
 
 	setActiveNav: function(nav_name) {
@@ -237,43 +132,6 @@ var App = {
 		$('#configuration_test_output .alert-danger').hide();
 	},
 
-	saveConfiguration: function(form_data) {
-		App.showGlobalError(null, null, false);
-		var camera_id = $('#edit_camera_id').val();
-		var is_new = (camera_id) ? false : true;
-		//hide the validation errors before trying to save
-		$('#configuration_form .form-group').removeClass('has-error');
-		$('#configuration_form .validation-message').html('').hide();
-
-		$.post(App.API_URL + 'cameras.php', form_data, function(data) {
-			//console.log('success', data);
-			App.showConfigurationSaveSuccess(data, is_new);
-
-		}).fail(function(data) {
-			if(data.responseJSON) {
-				var error_data = data.responseJSON;
-				if(error_data.errors) {
-					console.log(error_data.errors.length);
-					for(var i = 0; i < error_data.errors.length; i++) {
-						var error = error_data.errors[i];
-						if(error.type == 'global') {
-							App.showGlobalError(error.message, error.reason);
-						}
-						else if(error.type == 'field') {
-							var form_element = $('.camera-' + error.name + '-field');
-
-							form_element.addClass('has-error');
-							form_element.find('.validation-message').html(error.message).show();
-						}
-					}
-				}
-			}
-			else {
-				alert(data.responseText);
-			}
-		});
-	},
-
 	showConfigurationSaveSuccess: function(camera, is_new) {
 		camera['is_new'] = is_new;
 		var source = $('#save_success-template').html();
@@ -286,7 +144,7 @@ var App = {
 
 	showGlobalError: function(message, reason, show) {
 		if(show === false) {
-
+			$('#global_error').hide();
 		}
 		else {
 			var source = $('#global_error-template').html();
@@ -294,12 +152,27 @@ var App = {
 			var html = template({message: message, reason: reason});
 			$('#global_error').html(html);
 			console.log(message);
+			$('#global_error').show();
 		}
 	}
 };
 
 App.UI = {
-
+	showLogin: function() {
+		if($('#login').is(':visible')) {
+			return;
+		}
+		var source = $('#login-template').html();
+		var template = Handlebars.compile(source);
+		var html = template({});
+		//console.log();
+		$('#login').html(html);
+		App.changePage('login');
+		App.setActiveNav('settings_link');
+		if($('#main_nav').is(':visible')) {
+			$('#main_nav').collapse('hide');
+		}
+	}
 };
 
 
@@ -357,9 +230,26 @@ App.UI.FirstRun = {
 };
 
 App.API = {
-	saveUserSettings: function(form_data) {
+	login: function(form_data) {
+		console.log(form_data);
 		var dfd = new jQuery.Deferred();
-		$.post(App.API_URL + 'settings.php', form_data, function(data) {
+		$.post(App.API_URL + 'login.php', form_data, function(data) {
+			dfd.resolve(data);
+		}).fail(function(data) {
+			if(data.responseJSON) {
+				dfd.reject(data.responseJSON);
+			}
+			else {
+				dfd.reject(data.responseText);
+				alert(data.responseText);
+			}
+		});
+		return dfd;
+	},
+
+	logout: function() {
+		var dfd = new jQuery.Deferred();
+		$.get(App.API_URL + 'login.php', {action: 'logout'}, function(data) {
 			dfd.resolve(data);
 		}).fail(function(data) {
 			if(data.responseJSON) {
@@ -374,71 +264,7 @@ App.API = {
 	}
 };
 
-App.API.Motion = {
-	testServer: function(url) {
-		var dfd = new jQuery.Deferred();
-		$.get(App.API_URL + 'motion.php', {action: 'test_config', test_url: url}, function(data) {
-			dfd.resolve(data);
-		}).fail(function(data) {
-			if(data.responseJSON) {
-				dfd.reject(data.responseJSON);
-			}
-			else {
-				dfd.reject(data.responseText);
-				alert(data.responseText);
-			}
-		});
-		return dfd;
-	},
 
-	saveConfigurationSettings: function(form_data) {
-		var dfd = new jQuery.Deferred();
-		$.post(App.API_URL + 'motion.php', form_data, function(data) {
-			dfd.resolve(data);
-		}).fail(function(data) {
-			if(data.responseJSON) {
-				dfd.reject(data.responseJSON);
-			}
-			else {
-				dfd.reject(data.responseText);
-				alert(data.responseText);
-			}
-		});
-		return dfd;
-	},
-
-	getThreads: function(motion_id) {
-		var dfd = new jQuery.Deferred();
-		$.get(App.API_URL + 'motion.php',  {action: 'get_motion_threads', motion_id: motion_id}, function(data) {
-			dfd.resolve(data);
-		}).fail(function(data) {
-			if(data.responseJSON) {
-				dfd.reject(data.responseJSON);
-			}
-			else {
-				dfd.reject(data.responseText);
-				alert(data.responseText);
-			}
-		});
-		return dfd;
-	},
-
-	getThread: function(motion_id, thread_number) {
-		var dfd = new jQuery.Deferred();
-		$.get(App.API_URL + 'motion.php',  {action: 'get_motion_thread', motion_id: motion_id, thread_number: thread_number}, function(data) {
-			dfd.resolve(data);
-		}).fail(function(data) {
-			if(data.responseJSON) {
-				dfd.reject(data.responseJSON);
-			}
-			else {
-				dfd.reject(data.responseText);
-				alert(data.responseText);
-			}
-		});
-		return dfd;
-	}
-};
 
 
 function CameraUpdater(params)  {
@@ -521,22 +347,22 @@ function Router()  {
 			}
 			else if(page == 'edit_camera') {
 				if(bits.length > 1) {
-					App.showAddCamera(bits[1]);
+					App.UI.Cameras.showAddCamera(bits[1]);
 				}
 				else {
-					App.showAddCamera();
+					App.UI.Cameras.showAddCamera();
 				}
 			}
 			else if(page == 'import_camera') {
 				if(bits.length > 1) {
-					App.showAddCamera(null, bits[1], bits[2]);
+					App.UI.Cameras.showAddCamera(null, bits[1], bits[2]);
 				}
 				else {
-					App.showAddCamera();
+					App.UI.Cameras.showAddCamera();
 				}
 			}
 			else if(page == 'add_camera') {
-				App.showAddCamera();
+				App.UI.Cameras.showAddCamera();
 			}
 			else if(page == 'check') {
 				App.UI.FirstRun.check();
@@ -548,7 +374,6 @@ function Router()  {
 				else {
 
 				}
-
 			}
 			else if(page == 'import_motion_cameras') {
 				if(bits.length > 1) {
@@ -562,6 +387,20 @@ function Router()  {
 			else if(page == 'add_motion_server') {
 				App.UI.Settings.addMotionServer();
 			}
+			else if(page == 'edit_motion_server') {
+				if(bits.length > 1) {
+					App.UI.Settings.editMotionServer(bits[1]);
+				}
+				else {
+
+				}
+			}
+			else if(page == 'motion_servers') {
+				App.UI.Settings.showMotionServers();
+			}
+			else if(page == 'cameras') {
+				App.UI.Settings.showCameras();
+			}
 			else {
 				App.renderCameras();
 			}
@@ -570,6 +409,15 @@ function Router()  {
 }
 
 $( document ).ready(function() {
+
+	$.ajaxSetup({
+		statusCode: {
+			401: function() {
+				App.UI.showLogin();
+			}
+		}
+	});
+
 	App.Router = new Router();
 	var History = window.History;
 
@@ -584,23 +432,6 @@ $( document ).ready(function() {
 		App.Router.route();
 	});
 
-	$(document).on('click', '.delete-camera-link', function(e) {
-		var camera_id = $(this).data('camera-id');
-		App.deleteCamera(camera_id);
-	});
-
-	$(document).on('click', '.camera-command', function(e) {
-		var c_url = $(this).data('command-url');
-		$.get(App.API_URL + 'command_proxy.php', {command_url: c_url});
-	});
-	$(document).on('click', '#test_config_btn', function(e) {
-		App.testConfiguration();
-	});
-
-	$(document).on('click', '.add-command', function(e) {
-		App.addCommandForm();
-	});
-
 	$(document).on('click', 'a', function(e){
 
 		var href = $(this).attr('href');
@@ -612,33 +443,18 @@ $( document ).ready(function() {
 		}
 		e.preventDefault();
 
-		$('.app-page.active-page').addClass('animated slideOutLeft');
+		//$('.app-page.active-page').addClass('animated slideOutLeft');
 		History.pushState({page:href}, null, href);
 	});
 
-	$(document).on('submit', '#configuration_form', function( event ) {
-		event.preventDefault();
-		var url = App.getConfiguredCameraUrl();
-		console.log('saving', url);
-		$('#edit_image_url').val(App.getConfiguredCameraUrl() + $('#edit_camera_image').val());
-		$('#edit_camera_base_url').val(url);
-
-		App.saveConfiguration($(this).serialize());
-	});
 
 	$(document).on('submit', '.user-settings-form', function( event ) {
 		event.preventDefault();
-		var url = App.getConfiguredCameraUrl();
-		//console.log(event.target);
-		//console.log('saving', url);
-		//$('#edit_image_url').val(App.getConfiguredCameraUrl() + $('#edit_camera_image').val());
-		//$('#edit_camera_base_url').val(url);
 
-		console.log($(event.target).serialize());
 		$(event.target).find('.form-group').removeClass('has-error');
 		$(event.target).find('.validation-message').html('').hide();
 
-		App.API.saveUserSettings($(event.target).serialize()).then(function(data) {
+		App.API.Settings.saveUserSettings($(event.target).serialize()).then(function(data) {
 			FIRST_RUN = false;
 			History.pushState({page:'camera_list'}, null, 'camera_list');
 		},
@@ -660,38 +476,28 @@ $( document ).ready(function() {
 		});
 	});
 
-
-	$(document).on('click', '#edit_motion .test_config_btn', function( event ) {
-		App.UI.Settings.testMotionSettings();
+	$(document).on('submit', '#login_form', function( event ) {
+		event.preventDefault();
+		$('#login_form').removeClass('has-error');
+		$('#login_form').find('.validation-message').hide();
+		App.API.login($(this).serialize()).then(function(data) {
+			App.Router.route();
+		},
+		function(error) {
+			$('#login_form').addClass('has-error');
+			if(error.message) {
+				$('#login_form').find('.validation-message').html(error.message).show();
+			}
+		});
 	});
 
-	$(document).on('submit', '.edit_motion_form', function( event ) {
+	$(document).on('click', '.logout-btn', function( event ) {
 		event.preventDefault();
-		var url = App.UI.Settings.getConfiguredMotionUrl();
-		$('.edit_motion_form #edit_motion_url').val(url);
-		/*console.log('saving', url);
-		$('#edit_image_url').val(App.getConfiguredCameraUrl() + $('#edit_camera_image').val());
-		$('#edit_camera_base_url').val(url);*/
-		console.log($(event.target).serialize());
-		App.API.Motion.saveConfigurationSettings($(this).serialize()).then(function(data) {
-			console.log(data);
-			History.pushState({page:'import_motion_cameras/' + data.id}, null, 'import_motion_cameras/' + data.id);
+		App.API.logout().then(function(data) {
+			App.Router.route();
 		},
-		function(error_data) {
-			if(error_data.errors) {
-				for(var i = 0; i < error_data.errors.length; i++) {
-					var error = error_data.errors[i];
-					if(error.type == 'global') {
-						App.showGlobalError(error.message, error.reason);
-					}
-					else if(error.type == 'field') {
-						var form_element = $('.motion-' + error.name + '-field');
-
-						form_element.addClass('has-error');
-						form_element.find('.validation-message').html(error.message).show();
-					}
-				}
-			}
+		function(error) {
+			console.log(error);
 		});
 	});
 

@@ -1,6 +1,6 @@
 <?
 	require_once('config.php');
-	session_start();
+	require_once('security.php');
 	$path = CAMERA_DATA_PATH.'/';
 	//for testing configuration before saving
 	if(isset($_GET['configuration_test'])) {

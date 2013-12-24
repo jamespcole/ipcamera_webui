@@ -1,9 +1,16 @@
 <?
 	require_once('config.php');
+	if(!FIRST_RUN) {
+		require_once('security.php');
+	}
 	header('Content-Type: application/json');
 
 	if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-
+		$user_data = json_decode('{}');
+		if(file_exists(USER_DATA_PATH)) {
+			$user_data = json_decode(file_get_contents(USER_DATA_PATH));
+		}
+		echo json_encode($user_data);
 	}
 	else if($_SERVER['REQUEST_METHOD'] === 'POST') {
 
@@ -32,6 +39,10 @@
 		$json_data = json_encode($user_data);
 		file_put_contents(USER_DATA_PATH, $json_data);
 		chmod(USER_DATA_PATH, 0775);
+		if(FIRST_RUN) {
+			session_start();
+			$_SESSION['logged_in'] = TRUE;
+		}
 		echo $json_data;
 		/*$camera_data->username = $_POST['username'];
 		$camera_data->password = $_POST['password'];

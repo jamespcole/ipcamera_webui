@@ -442,6 +442,10 @@ $( document ).ready(function() {
 		}
 	});
 
+	App.Router.add404Handler(function() {
+		console.log('404');
+	});
+
 	var History = window.History;
 
 	App.Router.route();

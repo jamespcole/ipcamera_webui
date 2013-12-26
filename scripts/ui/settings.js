@@ -61,7 +61,7 @@ App.UI.Settings = {
 	addMotionServer: function() {
 		var source = $('#edit_motion-template').html();
 		var template = Handlebars.compile(source);
-		var html = template({port: '8080', server: '127.0.0.1'});
+		var html = template({port: '8080', server: '127.0.0.1', 'config_file': '/etc/motion/motion.conf'});
 		$('#edit_motion').html(html);
 		App.changePage('edit_motion');
 		App.setActiveNav('settings_link');
@@ -230,7 +230,9 @@ $( document ).ready(function() {
 		event.preventDefault();
 		var url = App.UI.Settings.getConfiguredMotionUrl();
 		$('.edit_motion_form #edit_motion_url').val(url);
-		console.log($(event.target).serialize());
+		//hide the validation errors before trying to save
+		$('.edit_motion_form .form-group').removeClass('has-error');
+		$('.edit_motion_form .validation-message').html('').hide();
 		App.API.Motion.saveConfigurationSettings($(this).serialize()).then(function(data) {
 			if($('.edit_motion_form #edit_motion_id').val()) {
 				History.pushState({page:'motion_servers'}, null, 'motion_servers');

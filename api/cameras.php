@@ -21,6 +21,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		$is_new = FALSE;
 	}
 	$camera_data = json_decode('{}');
+	if(!$is_new) {
+		$json_file = $path.$_GET['id'].'/camera.json';
+		if(file_exists($json_file)) {
+			$camera_data = json_decode(file_get_contents($json_file));
+		}
+	}
 	$camera_data->id = $new_id;
 	$camera_data->name = $_POST['name'];
 	$camera_data->username = $_POST['username'];
@@ -125,6 +131,9 @@ else if(isset($_GET['id'])) {
 		$camera_data = json_decode(file_get_contents($json_file));
 		$camera_data->id = $_GET['id'];
 		$result['camera'] = $camera_data;
+		if(isset($_GET['include_motion_servers']) && $_GET['include_motion_servers'] == 'true') {
+			$result['motion_servers'] = getMotionServers();
+		}
 	}
 }
 else {

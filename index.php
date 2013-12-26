@@ -109,6 +109,7 @@
     <script src="<?=BASE_URL?>styles/bootstrap/js/bootstrap.min.js"></script>
 
     <script src="<?=BASE_URL?>scripts/handlebars-v1.1.2.js"></script>
+    <script src="<?=BASE_URL?>scripts/simplerouter.js"></script>
     <script src="<?=BASE_URL?>scripts/app.js"></script>
 	<script src="<?=BASE_URL?>scripts/api/settings.js"></script>
 	<script src="<?=BASE_URL?>scripts/api/motion.js"></script>

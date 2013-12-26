@@ -51,6 +51,20 @@
 				</div>
 				<span class="help-block validation-message col-md-5 col-sm-3" style="display:none;"></span>
 			</div>
+			{{#if motion_servers.length}}
+				<div class="form-group camera-motion_server-field">
+					<label for="edit_camera_motion_server" class="col-md-2 col-sm-2 control-label">Motion Server</label>
+					<div class="col-md-5 col-sm-7">
+						<select class="form-control">
+							<option value="none">None</option>
+							{{#each motion_servers}}
+								<option value="{{id}}">{{name}}</option>
+							{{/each}}
+						</select>
+					</div>
+					<span class="help-block validation-message col-md-5 col-sm-3" style="display:none;"></span>
+				</div>
+			{{/if}}
 			<div class="form-group" style="display:none">
 				<div class="col-sm-offset-2 col-sm-10">
 					<div class="checkbox">

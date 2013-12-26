@@ -56,6 +56,13 @@
 					<input type="password" class="form-control" id="edit_motion_password" name="password" placeholder="Password" value="{{password}}">
 				</div>
 			</div>
+			<div class="form-group motion-config_file-field">
+				<label for="edit_motion_config_file" class="control-label col-md-2 col-sm-2">Config Path</label>
+				<div class="col-md-5 col-sm-6">
+					<input type="text" class="form-control" id="edit_motion_config_file" name="config_file" placeholder="Config File" value="{{config_file}}">
+				</div>
+				<span class="help-block validation-message col-md-5 col-sm-4" style="display:none;"></span>
+			</div>
 
 
 			<div class="form-group configuration_test_output" style="display:none">

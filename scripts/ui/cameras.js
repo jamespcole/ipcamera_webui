@@ -1,8 +1,9 @@
 App.UI.Cameras = {
 	showAddCamera: function(camera_id, motion_id, thread_number) {
 		if(camera_id) {
-			App.getCamera(camera_id).then(function(data) {
+			App.API.Cameras.getCamera(camera_id, true).then(function(data) {
 				var camera = data.camera;
+				camera['motion_servers'] = data.motion_servers;
 				var source = $('#add_camera-template').html();
 				var template = Handlebars.compile(source);
 				var html = template(camera);

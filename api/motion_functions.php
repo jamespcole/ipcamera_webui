@@ -37,18 +37,37 @@
 	}
 
 	function writeConfigValue($motion_data, $thread_number) {
-		//$url = getMotionUrl($motion_data).'0/config/set?control_html_output=on';
-		//$data = file_get_contents($url);
 		$url = getMotionUrl($motion_data).$thread_number.'/config/writeyes';
 		$data = file_get_contents($url);
 		return $data;
 	}
 
-	function checkMainConfigWriteable() {
-		if(!is_writable('/etc/motion/motion.conf')) {
+	function checkMainConfigWriteable($motion_data) {
+		if(!is_writable($motion_data->config_file)) {
 			return FALSE;
 		}
 		return TRUE;
 	}
+
+	function getMotionServers() {
+		$path = MOTION_DATA_PATH.'/';
+		$contents = scandir($path);
+		$results = array();
+		foreach($contents as $item) {
+			if($item == '.' || $item == '..') {
+				continue;
+			}
+			if(is_dir($path.$item)) {
+				$json_file = $path.$item.'/server.json';
+				if(file_exists($json_file)) {
+					$motion_data = json_decode(file_get_contents($json_file));
+					$motion_data->id = $item;
+					array_push($results, $motion_data);
+				}
+			}
+		}
+		return $results;
+	}
+
 
 ?>

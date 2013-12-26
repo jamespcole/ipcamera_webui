@@ -15,21 +15,21 @@
 				if(!$test_url) {
 					throw new Exception('No motion url was passed to test.');
 				}
-				else {
-					$result = @file_get_contents($test_url);
-					if($result === FALSE) {
-						throw new Exception('Could not connect to motion server.');
-					}
 
-					if(strpos($result, '<html>') === 0) {
-						throw new Exception('Motion is returning html, make sure you have the control_html_output setting set to off in motion.conf');
-					}
-
-					$results['result'] = 'ok';
-					$results['message'] = 'Motion server contacted successfully';
-					$results['motion_reponse'] = $result;
-
+				$result = @file_get_contents($test_url);
+				if($result === FALSE) {
+					throw new Exception('Could not connect to motion server.');
 				}
+
+				if(strpos($result, '<html>') === 0) {
+					throw new Exception('Motion is returning html, make sure you have the control_html_output setting set to off in motion.conf');
+				}
+
+				$results['result'] = 'ok';
+				$results['message'] = 'Motion server contacted successfully';
+				$results['motion_reponse'] = $result;
+
+
 			}
 			catch(Exception $ex) {
 				$results['result'] = 'error';
@@ -40,23 +40,7 @@
 		}
 
 		if(!empty($_GET['action']) && $_GET['action'] == 'get_motion_servers') {
-			$contents = scandir($path);
-			$result['motion_servers'] = array();
-			foreach($contents as $item) {
-
-				if($item == '.' || $item == '..') {
-					continue;
-				}
-				if(is_dir($path.$item)) {
-					$json_file = $path.$item.'/server.json';
-					if(file_exists($json_file)) {
-						$motion_data = json_decode(file_get_contents($json_file));
-						$motion_data->id = $item;
-						array_push($result['motion_servers'], $motion_data);
-						//echo $camera_data;
-					}
-				}
-			}
+			$result['motion_servers'] = getMotionServers();
 			echo json_encode($result);
 			die();
 		}
@@ -131,7 +115,7 @@
 				$results['message'] = 'Motion server contacted successfully';
 				$results['threads'] = $threads;
 
-				$config_ok = checkMainConfigWriteable();
+				$config_ok = checkMainConfigWriteable($motion_data);
 				$config_check = array();
 				$config_check['can_write'] = $config_ok;
 				if($config_ok) {
@@ -243,6 +227,9 @@
 			$is_new = FALSE;
 		}
 		$motion_data = json_decode('{}');
+		if(!$is_new) {
+			$motion_data = loadMotionData($new_id);
+		}
 		$motion_data->id = $new_id;
 		$motion_data->name = $_POST['name'];
 		$motion_data->username = $_POST['username'];
@@ -251,6 +238,7 @@
 		$motion_data->port = $_POST['port'];
 		$motion_data->url = $_POST['url'];
 		$motion_data->protocol = $_POST['protocol'];
+		$motion_data->config_file = $_POST['config_file'];
 
 		header('Content-Type: application/json');
 		$json_data = json_encode($motion_data, JSON_PRETTY_PRINT);
@@ -334,6 +322,26 @@
 				'name' => 'port',
 				'message' => 'You must select a port',
 				'reason' => 'You must set a port for the motion server'
+			));
+		}
+
+		if(!isset($_POST['config_file']) || $_POST['config_file'] == '') {
+			$is_valid = FALSE;
+			array_push($result->errors, array(
+				'type' => 'field',
+				'name' => 'config_file',
+				'message' => 'You must select a config file location',
+				'reason' => 'You must set a config file location for the motion server'
+			));
+		}
+
+		if(isset($_POST['config_file']) && !file_exists($_POST['config_file'])) {
+			$is_valid = FALSE;
+			array_push($result->errors, array(
+				'type' => 'field',
+				'name' => 'config_file',
+				'message' => 'The motion config file could not be found.',
+				'reason' => 'The motion config file could not be found at this location'
 			));
 		}
 

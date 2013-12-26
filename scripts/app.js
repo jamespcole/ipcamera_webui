@@ -25,16 +25,16 @@ var App = {
 		});
 	},
 
-	getCamera: function(camera_id) {
+	/*getCamera: function(camera_id) {
 		var dfd = new jQuery.Deferred();
 		$.get(App.API_URL + 'cameras.php', {id: camera_id }, function(data) {
 			dfd.resolve(data);
 		});
 		return dfd;
-	},
+	},*/
 
 	renderCamera: function(camera_id) {
-		App.getCamera(camera_id).then(function(data) {
+		App.API.Cameras.getCamera(camera_id).then(function(data) {
 			var source   = $("#view_camera-template").html();
 			var template = Handlebars.compile(source);
 			var html    = template(data.camera);
@@ -312,101 +312,6 @@ function CameraUpdater(params)  {
 	}
 };
 
-function Router()  {
-	this.init = function() {
-
-	},
-
-	this.route = function() {
-		var url_data = window.location.href.replace(BASE_URL, '');
-		//console.log(url_data);
-		var bits = url_data.split('/');
-		//console.log(bits);
-		if(bits.length == 0 || bits[0] == '' || bits[0] == '/') {
-			if(FIRST_RUN) {
-				App.UI.FirstRun.show();
-			}
-			else {
-				App.renderCameras();
-			}
-		}
-		else {
-			var page = bits[0];
-
-			if(page == 'camera_list') {
-				App.renderCameras();
-			}
-			else if(page == 'settings') {
-				App.UI.Settings.showSettings();
-			}
-			else if(page == 'user_settings') {
-				App.UI.Settings.userSettings();
-			}
-			else if(page == 'firstrun_user_settings') {
-				App.UI.FirstRun.userSettings();
-			}
-			else if(page == 'edit_camera') {
-				if(bits.length > 1) {
-					App.UI.Cameras.showAddCamera(bits[1]);
-				}
-				else {
-					App.UI.Cameras.showAddCamera();
-				}
-			}
-			else if(page == 'import_camera') {
-				if(bits.length > 1) {
-					App.UI.Cameras.showAddCamera(null, bits[1], bits[2]);
-				}
-				else {
-					App.UI.Cameras.showAddCamera();
-				}
-			}
-			else if(page == 'add_camera') {
-				App.UI.Cameras.showAddCamera();
-			}
-			else if(page == 'check') {
-				App.UI.FirstRun.check();
-			}
-			else if(page == 'view_camera') {
-				if(bits.length > 1) {
-					App.renderCamera(bits[1]);
-				}
-				else {
-
-				}
-			}
-			else if(page == 'import_motion_cameras') {
-				if(bits.length > 1) {
-					App.UI.Settings.importMotionCameras(bits[1]);
-				}
-				else {
-
-				}
-
-			}
-			else if(page == 'add_motion_server') {
-				App.UI.Settings.addMotionServer();
-			}
-			else if(page == 'edit_motion_server') {
-				if(bits.length > 1) {
-					App.UI.Settings.editMotionServer(bits[1]);
-				}
-				else {
-
-				}
-			}
-			else if(page == 'motion_servers') {
-				App.UI.Settings.showMotionServers();
-			}
-			else if(page == 'cameras') {
-				App.UI.Settings.showCameras();
-			}
-			else {
-				App.renderCameras();
-			}
-		}
-	}
-}
 
 $( document ).ready(function() {
 
@@ -418,7 +323,125 @@ $( document ).ready(function() {
 		}
 	});
 
-	App.Router = new Router();
+	App.Router = new SimpleRouter();
+
+	App.Router.addRoute({
+		url: 'camera_list',
+		navigate: function(params) {
+			App.renderCameras();
+		}
+	});
+
+	App.Router.addRoute({
+		url: 'settings',
+		navigate: function(params) {
+			App.UI.Settings.showSettings();
+		}
+	});
+
+	App.Router.addRoute({
+		url: 'user_settings',
+		navigate: function(params) {
+			App.UI.Settings.userSettings();
+		}
+	});
+
+	App.Router.addRoute({
+		url: 'firstrun_user_settings',
+		navigate: function(params) {
+			App.UI.FirstRun.userSettings();
+		}
+	});
+
+	App.Router.addRoute({
+		url: 'edit_camera',
+		navigate: function(params) {
+			App.UI.Cameras.showAddCamera();
+		}
+	});
+
+	App.Router.addRoute({
+		url: 'edit_camera/:camera_id',
+		navigate: function(params) {
+			App.UI.Cameras.showAddCamera(params.camera_id);
+		}
+	});
+
+	App.Router.addRoute({
+		url: 'import_camera/:motion_id/:thread_number',
+		navigate: function(params) {
+			App.UI.Cameras.showAddCamera(null, params.motion_id, params.thread_number);
+		}
+	});
+
+	App.Router.addRoute({
+		url: 'add_camera',
+		navigate: function(params) {
+			App.UI.Cameras.showAddCamera();
+		}
+	});
+
+	App.Router.addRoute({
+		url: 'check',
+		navigate: function(params) {
+			App.UI.FirstRun.check();
+		}
+	});
+
+	App.Router.addRoute({
+		url: 'view_camera/:camera_id',
+		navigate: function(params) {
+			App.renderCamera(params.camera_id);
+		}
+	});
+
+	App.Router.addRoute({
+		url: 'add_motion_server',
+		navigate: function(params) {
+			App.UI.Settings.addMotionServer();
+		}
+	});
+
+	App.Router.addRoute({
+		url: 'edit_motion_server/:motion_id',
+		navigate: function(params) {
+			App.UI.Settings.editMotionServer(params.motion_id);
+		}
+	});
+
+	App.Router.addRoute({
+		url: 'motion_servers',
+		navigate: function(params) {
+			App.UI.Settings.showMotionServers();
+		}
+	});
+
+	App.Router.addRoute({
+		url: 'cameras',
+		navigate: function(params) {
+			App.UI.Settings.showCameras();
+		}
+	});
+
+	App.Router.addRoute({
+		url: 'import_motion_cameras/:motion_id',
+		navigate: function(params) {
+			App.UI.Settings.importMotionCameras(params.motion_id);
+		}
+	});
+
+	App.Router.addRoute({
+		url: '',
+		navigate: function(params) {
+			if(FIRST_RUN) {
+				App.UI.FirstRun.show();
+			}
+			else {
+				App.renderCameras();
+			}
+		}
+	});
+
 	var History = window.History;
 
 	App.Router.route();

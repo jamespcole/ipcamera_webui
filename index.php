@@ -101,6 +101,9 @@
 		<div id="login" class="app-page">
 
 		</div>
+		<div id="error_404" class="app-page">
+
+		</div>
 	</div>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
@@ -166,6 +169,7 @@
 	<? include('includes/ui/cameras.php'); ?>
 	<? include('includes/ui/add_camera.php'); ?>
 	<? include('includes/ui/login.php'); ?>
+	<? include('includes/ui/error_404.php'); ?>
 	 <script id="view_camera-template" type="text/x-handlebars-template">
 	    <div class="row well col-md-8 col-md-offset-2">
 			<div class="col-md-12">

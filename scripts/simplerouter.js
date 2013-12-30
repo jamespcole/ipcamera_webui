@@ -13,6 +13,10 @@ function SimpleRouter()  {
 			var route = this.routes[i];
 			var match = this.matchRoute(route, bits);
 			if(match !== false) {
+				if(route.include_querystring === true) {
+					var q_str = this.parseQueryString(query_string);
+					$.extend(match, q_str);
+				}
 				route.navigate(match);
 				return;
 			}
@@ -50,6 +54,7 @@ function SimpleRouter()  {
 		if(route['url_parts'].length == 0) {
 			route['url_parts'].push(route.url);
 		}
+
 		if(route.include_querystring === undefined) {
 			route['include_querystring'] = true;
 		}
@@ -67,19 +72,22 @@ function SimpleRouter()  {
 			query_string: ''
 		};
 		if(window.location.href.indexOf('#') != -1) {
+			var hash = window.location.hash;
 			if(window.location.hash.indexOf('?') !== -1) {
-				var hash = window.location.hash;
+
 				var hash_bits = window.location.hash.split('?');
 				if(hash_bits.length > 1) {
 					result.query_string = hash_bits[1];
 					hash = hash_bits[0];
 				}
+
 			}
 			else if(window.location.search !== '') {
 				result.query_string = window.location.search.replace('?', '');
 			}
 			hash = hash.replace('#!', '');
 			result.url_data = hash.replace('#', '').split('/');
+
 			if(result.url_data.length == 0) {
 				result.url_data.push(hash);
 			}
@@ -91,10 +99,30 @@ function SimpleRouter()  {
 				result.url_data.push(window.location.pathname);
 			}
 		}
+		//result.url_data.push('');
 		return result;
 	},
 
+	/*this.cleanPath = function(path) {
+		//replace(/^\/|\/$/g, '').split('/');
+		return path;
+	},*/
+
 	this.parseQueryString = function(query_string) {
 		var result = {};
+		if(query_string == '') {
+			return result;
+		}
+		var parts = query_string.split('&');
+		for(var i = 0; i < parts.length; i++) {
+				var parts = query_string.split('=');
+				if(parts.length == 1) {
+					result[parts[0]] = decodeURIComponent(parts[0]);
+				}
+				else if(parts.length == 2) {
+					result[parts[0]] = decodeURIComponent(parts[1]);
+				}
+		}
+		return result;
 	}
 };

@@ -159,9 +159,9 @@ var App = {
 
 App.UI = {
 	showLogin: function() {
-		if($('#login').is(':visible')) {
+		/*if($('#login').is(':visible')) {
 			return;
-		}
+		}*/
 		var source = $('#login-template').html();
 		var template = Handlebars.compile(source);
 		var html = template({});
@@ -172,6 +172,15 @@ App.UI = {
 		if($('#main_nav').is(':visible')) {
 			$('#main_nav').collapse('hide');
 		}
+	},
+
+	show404: function(error_data) {
+		var source = $('#error_404-template').html();
+		var template = Handlebars.compile(source);
+		var html = template(error_data);
+		$('#error_404').html(html);
+		App.changePage('error_404');
+		App.setActiveNav('settings_link');
 	}
 };
 
@@ -444,6 +453,7 @@ $( document ).ready(function() {
 
 	App.Router.add404Handler(function() {
 		console.log('404');
+		App.UI.show404({ message: "The requested page could not be found."});
 	});
 
 	var History = window.History;

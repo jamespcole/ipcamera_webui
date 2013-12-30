@@ -44,7 +44,7 @@ var App = {
 				type: 'DELETE',
 				success: function(result) {
 					console.log(result);
-					App.UI.Settings.showSettings();
+					App.UI.Settings.showCameras();
 				}
 			}).fail(function(error) {
 				console.log(error);

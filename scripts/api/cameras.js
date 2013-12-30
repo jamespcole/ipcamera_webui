@@ -38,6 +38,39 @@ App.API.Cameras = {
 			}
 		});
 		return dfd;
+	},
+
+	getHistory: function(params) {
+		var dfd = new jQuery.Deferred();
+		$.get(App.API_URL + 'history.php', params, function(data) {
+			dfd.resolve(data);
+		}).fail(function(data) {
+			if(data.responseJSON) {
+				dfd.reject(data.responseJSON);
+			}
+			else {
+				dfd.reject(data.responseText);
+				alert(data.responseText);
+			}
+		});
+		return dfd;
+	},
+
+	getEventData: function(params) {
+		var dfd = new jQuery.Deferred();
+		params['action'] = 'event_data';
+		$.get(App.API_URL + 'history.php', params, function(data) {
+			dfd.resolve(data);
+		}).fail(function(data) {
+			if(data.responseJSON) {
+				dfd.reject(data.responseJSON);
+			}
+			else {
+				dfd.reject(data.responseText);
+				alert(data.responseText);
+			}
+		});
+		return dfd;
 	}
 
 };

@@ -4,6 +4,7 @@ App.API.Settings = {
 		var dfd = new jQuery.Deferred();
 		$.post(App.API_URL + 'settings.php', form_data, function(data) {
 			dfd.resolve(data);
+			App.current_user = data;
 		}).fail(function(data) {
 			if(data.responseJSON) {
 				dfd.reject(data.responseJSON);

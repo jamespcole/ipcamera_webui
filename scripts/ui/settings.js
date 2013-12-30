@@ -30,7 +30,7 @@ App.UI.Settings = {
 				var template = Handlebars.compile(source);
 				var html = template(data);
 				$('#user_settings').html(html);
-				if(data.time_format == 'HH:mm') {
+				if(data.time_format == 'HH:mm:ss') {
 					$('#user_settings .time_24').attr('checked','checked');
 				}
 				else {

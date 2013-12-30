@@ -18,6 +18,8 @@
     <link href="<?=BASE_URL?>styles/style.css" rel="stylesheet">
     <link href="<?=BASE_URL?>styles/animate.min.css" rel="stylesheet">
 
+    <link href="<?=BASE_URL?>scripts/vendor/slider/css/slider.css" rel="stylesheet">
+
     <script type="text/javascript">
     var BASE_URL = '<?=BASE_URL?>';
     var FIRST_RUN = <?=json_encode(FIRST_RUN)?>;
@@ -104,6 +106,9 @@
 		<div id="error_404" class="app-page">
 
 		</div>
+		<div id="view_event" class="app-page">
+
+		</div>
 	</div>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
@@ -113,6 +118,7 @@
 
     <script src="<?=BASE_URL?>scripts/handlebars-v1.1.2.js"></script>
     <script src="<?=BASE_URL?>scripts/simplerouter.js"></script>
+    <script src="<?=BASE_URL?>scripts/moment.min.js"></script>
     <script src="<?=BASE_URL?>scripts/app.js"></script>
 	<script src="<?=BASE_URL?>scripts/api/settings.js"></script>
 	<script src="<?=BASE_URL?>scripts/api/motion.js"></script>
@@ -120,6 +126,8 @@
     <script src="<?=BASE_URL?>scripts/ui/settings.js"></script>
     <script src="<?=BASE_URL?>scripts/ui/cameras.js"></script>
     <script src="<?=BASE_URL?>scripts/jquery.history.js"></script>
+    <script src="<?=BASE_URL?>scripts/vendor/slider/js/bootstrap-slider.js"></script>
+
 
     <script id="global_error-template" type="text/x-handlebars-template">
 		<div class="row">
@@ -169,30 +177,11 @@
 	<? include('includes/ui/cameras.php'); ?>
 	<? include('includes/ui/add_camera.php'); ?>
 	<? include('includes/ui/login.php'); ?>
+	<? include('includes/ui/history.php'); ?>
 	<? include('includes/ui/error_404.php'); ?>
-	 <script id="view_camera-template" type="text/x-handlebars-template">
-	    <div class="row well col-md-8 col-md-offset-2">
-			<div class="col-md-12">
-				<h4>{{name}}</h4>
-				<img src="{{image_url}}" class="img-thumbnail col-md-12" id="active_camera_image" />
-			</div>
-			{{#if commands}}
-				<div class="row">
-					<div class="col-md-12">
-						{{#each commands}}
-								<a class="camera-command btn btn-default" data-command-url="{{full_command_url}}">
-									{{#if command_icon}}
-										<span class="{{command_icon}}"></span>
-									{{/if}}
-									{{button_text}}
-								</a>
-						{{/each}}
-					</div>
-				</div>
-			{{/if}}
-		</div>
+	<? include('includes/ui/view_camera.php'); ?>
+	<? include('includes/ui/view_event.php'); ?>
 
-	</script>
 	<script id="prerequisite_check-template" type="text/x-handlebars-template">
 		<div class="col-md-offset-2 col-md-8">
 			<h1>Pre-flight Check</h1>

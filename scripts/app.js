@@ -1,6 +1,7 @@
 var App = {
 	API_URL: BASE_URL + 'api/',
 	camera_updaters: [],
+	current_user: null,
 
 	renderCameras: function() {
 
@@ -33,27 +34,7 @@ var App = {
 		return dfd;
 	},*/
 
-	renderCamera: function(camera_id) {
-		App.API.Cameras.getCamera(camera_id).then(function(data) {
-			var source   = $("#view_camera-template").html();
-			var template = Handlebars.compile(source);
-			var html    = template(data.camera);
-			$("#view_camera").html(html);
-			App.changePage('view_camera');
-			App.setActiveNav('cameras_link');
-			App.camera_updaters = [];
 
-			var camera = data.camera;
-			if(!App.camera_updaters['updater_active_camera_image']) {
-				var element = $('#active_camera_image');
-				var updater = new CameraUpdater({element: element, url: camera.image_url});
-				updater.init();
-				updater.start();
-				App.camera_updaters['active_camera_image'] = updater;
-			}
-
-		});
-	},
 
 	deleteCamera: function(camera_id) {
 		if(confirm('Are you sure you want to delete this camera?')) {
@@ -247,6 +228,7 @@ App.API = {
 		var dfd = new jQuery.Deferred();
 		$.post(App.API_URL + 'login.php', form_data, function(data) {
 			dfd.resolve(data);
+			App.current_user = data.user;
 		}).fail(function(data) {
 			if(data.responseJSON) {
 				dfd.reject(data.responseJSON);
@@ -263,6 +245,7 @@ App.API = {
 		var dfd = new jQuery.Deferred();
 		$.get(App.API_URL + 'login.php', {action: 'logout'}, function(data) {
 			dfd.resolve(data);
+			App.current_user = null;
 		}).fail(function(data) {
 			if(data.responseJSON) {
 				dfd.reject(data.responseJSON);
@@ -403,7 +386,7 @@ $( document ).ready(function() {
 	App.Router.addRoute({
 		url: 'view_camera/:camera_id',
 		navigate: function(params) {
-			App.renderCamera(params.camera_id);
+			App.UI.Cameras.renderCamera(params.camera_id);
 		}
 	});
 
@@ -443,6 +426,13 @@ $( document ).ready(function() {
 	});
 
 	App.Router.addRoute({
+		url: 'view_event/:camera_id/:date/:event_id',
+		navigate: function(params) {
+			App.UI.Cameras.viewEvent(params);
+		}
+	});
+
+	App.Router.addRoute({
 		url: '',
 		navigate: function(params) {
 			if(FIRST_RUN) {
@@ -461,7 +451,21 @@ $( document ).ready(function() {
 
 	var History = window.History;
 
-	App.Router.route();
+	//get the user data
+	App.API.Settings.getUserSettings().then(function(data) {
+		App.current_user = data;
+		App.Router.route();
+	},
+	function(error) {
+		if(error.message) {
+			App.showGlobalError("Could not connect to server", error.message, true);
+		}
+		else {
+			App.showGlobalError("Could not connect to server", "An error occurred while trying to communicate with the server.", true);
+		}
+	});
+
+
 
 	if ( !History.enabled ) { return false; }
     History.pushState({page: window.location.href},null, window.location.href);           // save initial state to browser history
@@ -541,5 +545,54 @@ $( document ).ready(function() {
 		});
 	});
 
+
+
+	Handlebars.registerHelper('dateFormat', function(context, block) {
+		if (window.moment) {
+			var fmat = (App.current_user) ? App.current_user.date_format : 'DD/MM/YYYY';
+			var f = block.hash.format || fmat;
+			if(block.hash.date_type == 'timestamp') {
+				return moment.unix(context).format(f);
+			}
+			else {
+				return moment(Date(context)).format(f);
+			}
+		}
+		else{
+			return context;   //  moment plugin not available. return data as is.
+		}
+	});
+
+	Handlebars.registerHelper('dateTimeFormat', function(context, block) {
+		if (window.moment) {
+			var fmat = (App.current_user) ? App.current_user.date_format + ' ' + App.current_user.time_format : 'DD/MM/YYYY HH:mm:ss';
+			var f = block.hash.format || fmat;
+			if(block.hash.date_type == 'timestamp') {
+				return moment.unix(context).format(f);
+			}
+			else {
+				return moment(Date(context)).format(f);
+			}
+		}
+		else{
+			return context;   //  moment plugin not available. return data as is.
+		}
+	});
+
+	Handlebars.registerHelper('timeFormat', function(context, block) {
+		if (window.moment) {
+			var fmat = (App.current_user) ? App.current_user.time_format : 'HH:mm:ss';
+			var f = block.hash.format || fmat;
+			if(block.hash.date_type == 'timestamp') {
+				return moment.unix(context).format(f);
+			}
+			else {
+				return moment(Date(context)).format(f);
+			}
+		}
+		else{
+			return context;   //  moment plugin not available. return data as is.
+		}
+	});
 
 });

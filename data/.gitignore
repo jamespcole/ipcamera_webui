@@ -1,5 +1,6 @@
 *
 !motion_servers
 !cameras
+!backup
 !.htaccess
 !.gitignore

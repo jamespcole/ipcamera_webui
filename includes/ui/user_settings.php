@@ -42,11 +42,11 @@
 				<label class="col-sm-2 control-label">Time Format</label>
 				<div class="col-sm-5">
 					<label class="checkbox-inline">
-						<input type="radio" name="time_format" class="time_24" value="HH:mm">
+						<input type="radio" name="time_format" class="time_24" value="HH:mm:ss">
 						24 Hour
 					</label>
 					<label class="checkbox-inline">
-						<input type="radio" name="time_format" class="time_12" value="hh:mmA">
+						<input type="radio" name="time_format" class="time_12" value="hh:mm:ssA">
 						12 Hour
 					</label>
 				</div>

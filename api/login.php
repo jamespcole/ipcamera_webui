@@ -26,6 +26,7 @@
 			$_SESSION['logged_in'] = TRUE;
 			$result['result'] = 'ok';
 			$result['message'] = 'Log in successfull';
+			$result['user'] = $user_data;
 			echo json_encode($result);
 			die();
 		}

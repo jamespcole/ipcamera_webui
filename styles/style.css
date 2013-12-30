@@ -18,3 +18,7 @@
 .navbar-brand {
 	padding-top:12px;
 }
+
+#view_event .slider {
+	width:100%;
+}

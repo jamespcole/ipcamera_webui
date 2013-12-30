@@ -116,15 +116,7 @@ var App = {
 		$('#configuration_test_output .alert-danger').hide();
 	},
 
-	showConfigurationSaveSuccess: function(camera, is_new) {
-		camera['is_new'] = is_new;
-		var source = $('#save_success-template').html();
-		var template = Handlebars.compile(source);
-		var html = template(camera);
-		$('#save_success').html(html);
-		App.changePage('save_success');
-		App.setActiveNav('settings_link');
-	},
+
 
 	showGlobalError: function(message, reason, show) {
 		if(show === false) {
@@ -433,6 +425,22 @@ $( document ).ready(function() {
 	});
 
 	App.Router.addRoute({
+		url: 'save_success/:camera_id',
+		navigate: function(params) {
+			params['is_new'] = false;
+			App.UI.Cameras.showConfigurationSaveSuccess(params);
+		}
+	});
+
+	App.Router.addRoute({
+		url: 'create_success/:camera_id',
+		navigate: function(params) {
+			params['is_new'] = true;
+			App.UI.Cameras.showConfigurationSaveSuccess(params);
+		}
+	});
+
+	App.Router.addRoute({
 		url: '',
 		navigate: function(params) {
 			if(FIRST_RUN) {
@@ -482,9 +490,9 @@ $( document ).ready(function() {
 		if(!href) {
 			return;
 		}
-		if(href.indexOf(BASE_URL) !== 0) {
+		/*if(href.indexOf(BASE_URL) !== 0) {
 			return;
-		}
+		}*/
 		e.preventDefault();
 
 		//$('.app-page.active-page').addClass('animated slideOutLeft');

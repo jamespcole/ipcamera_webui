@@ -231,6 +231,28 @@ App.UI.Cameras = {
 
 		view_element.data('next-frame-index', next_index);
 		//setTimeout(1000, App.UI.Cameras.startVideo(view_element, frames));
+	},
+
+	showConfigurationSaveSuccess: function(params) {
+		App.API.Cameras.getCamera(params.camera_id).then(function(data) {
+			var camera = data.camera;
+			camera['is_new'] = params.is_new;
+			var source = $('#save_success-template').html();
+			var template = Handlebars.compile(source);
+			var html = template(camera);
+			$('#save_success').html(html);
+			App.changePage('save_success');
+			App.setActiveNav('settings_link');
+		},
+		function(error) {
+			if(error.message) {
+				App.showGlobalError("Could not connect to API", error.message, true);
+			}
+			else {
+				App.showGlobalError("Could not connect to API", "An error occurred while trying to communicate with the API.", true);
+			}
+
+		});
 	}
 
 
@@ -269,7 +291,15 @@ $( document ).ready(function() {
 		App.API.Cameras.saveConfiguration($(this).serialize()).then(function(data) {
 			var camera_id = $('#edit_camera_id').val();
 			var is_new = (camera_id) ? false : true;
-			App.showConfigurationSaveSuccess(data, is_new);
+			console.log(data);
+			//App.showConfigurationSaveSuccess(data, is_new);
+			if(is_new) {
+				History.pushState({page:'create_success/' + data.camera_id}, null, 'create_success/' + data.id);
+			}
+			else {
+				History.pushState({page:'save_success/' + data.camera_id}, null, 'save_success/' + data.id);
+			}
+
 		},
 		function(error_data) {
 			if(error_data.errors) {

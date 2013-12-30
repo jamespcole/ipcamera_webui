@@ -32,7 +32,7 @@
 					$result = array();
 					$result['date'] = $item;
 					array_push($results['dates'], $result);
-					$events = scandir($history_dir.'/'.$item);
+					$events = scandir($history_dir.'/'.$item, SCANDIR_SORT_DESCENDING);
 					foreach($events as $event) {
 						if($event == '.' || $event == '..') {
 							continue;

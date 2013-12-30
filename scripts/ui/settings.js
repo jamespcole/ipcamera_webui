@@ -121,10 +121,11 @@ App.UI.Settings = {
 	},
 
 	importMotionCameras: function(motion_id) {
-		console.log(motion_id);
 		App.API.Motion.getThreads(motion_id).then(function(data) {
 			var source = $('#import_motion_cameras-template').html();
 			var template = Handlebars.compile(source);
+			data['motion_id'] = motion_id;
+			//console.log(data);
 			var html = template(data);
 			$('#import_motion_cameras').html(html);
 			App.changePage('import_motion_cameras');
@@ -257,6 +258,10 @@ $( document ).ready(function() {
 				}
 			}
 		});
+	});
+
+	$(document).on('click', '.try-again-motion-btn', function(e) {
+		App.UI.Settings.importMotionCameras($(e.target).data('motion-id'));
 	});
 
 

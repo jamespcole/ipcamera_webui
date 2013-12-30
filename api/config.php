@@ -4,6 +4,7 @@
 	define('CAMERA_DATA_PATH', DATA_PATH.'/cameras');
 	define('MOTION_DATA_PATH', DATA_PATH.'/motion_servers');
 	define('USER_DATA_PATH', DATA_PATH.'/user.json');
+	define('BACKUP_DATA_PATH', DATA_PATH.'/backup');
 
 
 	define('FIRST_RUN', !file_exists(USER_DATA_PATH));

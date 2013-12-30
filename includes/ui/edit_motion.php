@@ -111,12 +111,13 @@
 				<p><i>sudo apt-get install motion</i></p>
 
 				<p>Now motion must be configured:</p>
-				<p>Run the following and set "start_motion_daemon" to yes so that motion will run automatically</p>
+				<p>Run the following and set "start_motion_daemon" to "yes" so that motion will run automatically</p>
 				<p><i>sudo nano /etc/default/motion</i></p>
 				<p>Open the motion config file and with the following command:
 				<p><i>sudo nano /etc/motion/motion.conf</i></p>
 				<p>Change to following:</p>
 
+				<p><i>setup_mode off</i></p>
 				<p><i>control_localhost off</i></p>
 				<p><i>control_html_output off</i></p>
 

@@ -98,7 +98,10 @@ var App = {
 
 	getConfiguredCameraUrl: function() {
 		var url = '';
-		url += 'http://';
+		//url += 'http://';
+		var protocol = $('#configuration_form').find('#edit_camera_protocol').val();
+		url += protocol + '://';
+
 		var username = $('#edit_camera_username').val();
 		if(username) {
 			url += username + ':';

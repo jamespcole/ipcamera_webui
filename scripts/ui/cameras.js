@@ -8,6 +8,9 @@ App.UI.Cameras = {
 				var template = Handlebars.compile(source);
 				var html = template(camera);
 				$('#add_camera').html(html);
+
+				$('#edit_camera_protocol').val(data.camera.protocol);
+
 				if(camera.proxy_data === true) {
 					$('#edit_proxy_data').attr('checked', 'checked');
 				}
@@ -43,13 +46,26 @@ App.UI.Cameras = {
 			});
 		}
 		else {
-			var source = $('#add_camera-template').html();
-			var template = Handlebars.compile(source);
-			var html = template({port: 80});
-			$('#add_camera').html(html);
-			$('#edit_proxy_data').attr('checked', 'checked');
-			App.changePage('add_camera');
-			App.setActiveNav('settings_link');
+			App.API.Motion.getMotionServers().then(function(data) {
+				data['port'] = 80;
+				var source = $('#add_camera-template').html();
+				var template = Handlebars.compile(source);
+				var html = template(data);
+				$('#add_camera').html(html);
+				$('#edit_proxy_data').attr('checked', 'checked');
+				App.changePage('add_camera');
+				App.setActiveNav('settings_link');
+			},
+			function(error) {
+				if(error.message) {
+					App.showGlobalError("Could not connect to API", error.message, true);
+				}
+				else {
+					App.showGlobalError("Could not connect to API", "An error occurred while trying to communicate with the API.", true);
+				}
+
+			});
+
 		}
 	},
 

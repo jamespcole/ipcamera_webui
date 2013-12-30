@@ -9,7 +9,7 @@
 			<input type="hidden" id="edit_camera_id" name="id" value="{{id}}" />
 			<input type="hidden" id="edit_camera_base_url" name="base_url" value="{{base_url}}" />
 			<input type="hidden" id="edit_camera_is_motion_stream" name="is_motion_stream" value="{{is_motion_stream}}" />
-			<input type="hidden" id="edit_camera_motion_id" name="motion_id" value="{{motion_id}}" />
+			<!--<input type="hidden" id="edit_camera_motion_id" name="motion_id" value="{{motion_id}}" />-->
 			<input type="hidden" id="edit_camera_thread_number" name="thread_number" value="{{thread_number}}" />
 			<div class="form-group camera-name-field">
 				<label for="edit_camera_name" class="col-md-2 col-sm-2 control-label">Name</label>
@@ -17,6 +17,16 @@
 					<input type="text" class="form-control" id="edit_camera_name" name="name" placeholder="Enter Camera Name" value="{{name}}">
 				</div>
 				<span class="help-block validation-message col-md-5 col-sm-3" style="display:none;"></span>
+			</div>
+			<div class="form-group">
+				<label class="control-label col-md-2 col-sm-2">Protocol</label>
+				<div class="col-md-5 col-sm-6">
+					<select class="form-control" name="protocol" id="edit_camera_protocol">
+						<option value="http">HTTP</option>
+						<option value="https">HTTPS</option>
+					</select>
+				</div>
+				<span class="help-block validation-message col-md-5 col-sm-4" style="display:none;"></span>
 			</div>
 			<div class="form-group camera-server-field">
 				<label for="edit_camera_ip" class="col-md-2 col-sm-2 control-label">Server/IP</label>
@@ -55,7 +65,7 @@
 				<div class="form-group camera-motion_server-field">
 					<label for="edit_camera_motion_server" class="col-md-2 col-sm-2 control-label">Motion Server</label>
 					<div class="col-md-5 col-sm-7">
-						<select class="form-control">
+						<select class="form-control" id="edit_camera_motion_id" name="motion_id">
 							<option value="none">None</option>
 							{{#each motion_servers}}
 								<option value="{{id}}">{{name}}</option>

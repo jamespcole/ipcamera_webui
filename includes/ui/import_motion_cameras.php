@@ -8,23 +8,36 @@
 				<p><i>sudo usermod -a -G motion www-data</i></p>
 				<p><i>sudo chmod g+w /etc/motion/motion.conf</i></p>
 				<p><i>sudo service apache2 restart</i></p>
+
 			</div>
+			<a class="btn btn-lg btn-danger pull-right try-again-motion-btn" role="button" data-motion-id="{{motion_id}}">Try Again</a>
 		{{/unless}}
-		<h2>Motion Server Cameras</h2>
-		<table class="table">
-			<tbody>
-			{{#each threads}}
-				<tr>
-					<td><img style="max-height:40px" src="{{image}}" class="img-thumbnail" /></td>
-					<td><h4>{{name}}</h4></td>
-					<td>
-						<div class="pull-right">
-							<a href="<?=BASE_URL?>import_camera/{{motion_id}}/{{number}}" class="btn btn-success import-camera-link" data-motion-id="{{motion_id}}">Import</a>
-						</div>
-					</td>
-				</tr>
-			{{/each}}
-			</tbody>
-		</table>
+		{{#if config_check.can_write}}
+			<h2>Motion Server Cameras</h2>
+			{{#if threads}}
+				<table class="table">
+					<tbody>
+					{{#each threads}}
+						<tr>
+							<td><img style="max-height:40px" src="{{image}}" class="img-thumbnail" /></td>
+							<td><h4>{{name}}</h4></td>
+							<td>
+								<div class="pull-right">
+									<a href="<?=BASE_URL?>import_camera/{{motion_id}}/{{number}}" class="btn btn-success import-camera-link" data-motion-id="{{motion_id}}">Import</a>
+								</div>
+							</td>
+						</tr>
+					{{/each}}
+					</tbody>
+				</table>
+			{{else}}
+				<div class="alert alert-info">
+					<strong>There are no active cameras configured on your motion server.</strong>
+					<p>You can now add cameras to your motion server when creating or editing a camera.</p>
+				</div>
+				<a href="camera_list" class="btn btn-primary pull-right" role="button" data-motion-id="{{motion_id}}">Continue</a>
+
+			{{/if}}
+		{{/if}}
 	</div>
 </script>

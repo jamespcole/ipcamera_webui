@@ -28,6 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		}
 	}
 	$camera_data->id = $new_id;
+	$camera_data->protocol = $_POST['protocol'];
 	$camera_data->name = $_POST['name'];
 	$camera_data->username = $_POST['username'];
 	$camera_data->password = $_POST['password'];
@@ -65,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	}
 
 	//update motion
-	if($camera_data->motion_id) {
+	/*if($camera_data->motion_id) {
 		$motion_data = loadMotionData($camera_data->motion_id);
 		setConfigValue($motion_data, $camera_data->thread_number, 'target_dir', CAMERA_DATA_PATH.'/'.$camera_data->id.'/history');
 		setConfigValue($motion_data, $camera_data->thread_number, 'snapshot_filename', urlencode('%Y-%m-%d/%v/%v_%Y-%m-%d_%H-%M-%S-snapshot'));
@@ -73,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		setConfigValue($motion_data, $camera_data->thread_number, 'movie_filename',  urlencode('%Y-%m-%d/%v/%v_%Y-%m-%d_%H-%M-%S'));
 
 		writeConfigValue($motion_data, $camera_data->thread_number);
-	}
+	}*/
 
 	header('Content-Type: application/json');
 	$json_data = json_encode($camera_data, JSON_PRETTY_PRINT);
@@ -82,10 +83,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		if($is_new) {
 			mkdir($new_path);
 			chmod($new_path, 0775);
-		}
+			mkdir($new_path.'history');
+			chmod($new_path.'history', 0775);
 
+		}
+		if($is_new && $camera_data->motion_id) {
+			$camera_data->motion_config = createMotionFile($camera_data);
+			$json_data = json_encode($camera_data, JSON_PRETTY_PRINT);
+			addThread($camera_data->motion_id, $camera_data->motion_config);
+		}
 		file_put_contents($new_path.'camera.json', $json_data);
 		chmod($new_path.'camera.json', 0775);
+
 		echo $json_data;
 		die();
 	}
@@ -107,6 +116,13 @@ else if($_SERVER['REQUEST_METHOD'] === 'DELETE') {
 	$result = array();
 	if(isset($_GET['camera_id'])) {
 		$id = $_GET['camera_id'];
+		$json_file = $path.$id.'/camera.json';
+		if(file_exists($json_file)) {
+			$camera_data = json_decode(file_get_contents($json_file));
+			if($camera_data->motion_id && $camera_data->motion_config) {
+				removeThread($camera_data->motion_id, $camera_data->motion_config);
+			}
+		}
 		if(!rrmdir($path.$id)) {
 			header("HTTP/1.1 403 Unauthorized" );
 			$result['errors'] = array('type' => 'global', 'message' => 'Could not delete camera', 'reason' => 'The camera configuration could not be deleted.');

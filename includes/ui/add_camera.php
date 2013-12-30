@@ -66,7 +66,7 @@
 					<label for="edit_camera_motion_server" class="col-md-2 col-sm-2 control-label">Motion Server</label>
 					<div class="col-md-5 col-sm-7">
 						<select class="form-control" id="edit_camera_motion_id" name="motion_id">
-							<option value="none">None</option>
+							<option value="">None</option>
 							{{#each motion_servers}}
 								<option value="{{id}}">{{name}}</option>
 							{{/each}}

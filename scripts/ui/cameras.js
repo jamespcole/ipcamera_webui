@@ -10,6 +10,7 @@ App.UI.Cameras = {
 				$('#add_camera').html(html);
 
 				$('#edit_camera_protocol').val(data.camera.protocol);
+				$('#edit_camera_motion_id').val(data.camera.motion_id);
 
 				if(camera.proxy_data === true) {
 					$('#edit_proxy_data').attr('checked', 'checked');
@@ -24,7 +25,7 @@ App.UI.Cameras = {
 				App.setActiveNav('settings_link');
 			});
 		}
-		if(motion_id && thread_number !== null) {
+		else if(motion_id && thread_number !== null) {
 			App.API.Motion.getThread(motion_id, thread_number).then(function(data) {
 				var camera = data.thread;
 				var source = $('#add_camera-template').html();

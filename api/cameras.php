@@ -16,15 +16,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	}
 	$new_id = time();
 	$is_new = TRUE;
+
 	if(isset($_POST['id']) && $_POST['id'] != '') {
 		$new_id = $_POST['id'];
 		$is_new = FALSE;
 	}
+	$existing_motion_id = null;
 	$camera_data = json_decode('{}');
 	if(!$is_new) {
-		$json_file = $path.$_GET['id'].'/camera.json';
+		$json_file = $path.$new_id.'/camera.json';
 		if(file_exists($json_file)) {
 			$camera_data = json_decode(file_get_contents($json_file));
+			$existing_motion_id = $camera_data->motion_id;
 		}
 	}
 	$camera_data->id = $new_id;
@@ -36,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	$camera_data->port = $_POST['port'];
 	$camera_data->camera_image = $_POST['camera_image'];
 	$camera_data->base_url = $_POST['base_url'];
-	$camera_data->motion_id = $_POST['motion_id'];
+	$camera_data->motion_id = ($_POST['motion_id'] == 'none') ? '' : $_POST['motion_id'];
 	$camera_data->thread_number = $_POST['thread_number'];
 
 	if(isset($_POST['proxy_data']) && $_POST['proxy_data'] == 'on') {
@@ -65,6 +68,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		$camera_data->commands = $commands;
 	}
 
+	$motion_data = null;
+	if($camera_data->motion_id) {
+		$motion_data = loadMotionData($camera_data->motion_id);
+	}
 	//update motion
 	/*if($camera_data->motion_id) {
 		$motion_data = loadMotionData($camera_data->motion_id);
@@ -87,10 +94,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 			chmod($new_path.'history', 0775);
 
 		}
-		if($is_new && $camera_data->motion_id) {
+		if($is_new && $camera_data->motion_id) { //if it is new and has a motion server selected
 			$camera_data->motion_config = createMotionFile($camera_data);
 			$json_data = json_encode($camera_data, JSON_PRETTY_PRINT);
 			addThread($camera_data->motion_id, $camera_data->motion_config);
+		}
+		else if($existing_motion_id && !$camera_data->motion_id) { //if it used to have a motion server and it no longer does
+			removeThread($existing_motion_id, $camera_data->motion_config);
+		}
+		else if($existing_motion_id && ($existing_motion_id != $camera_data->motion_id)) { //if we are changing the motion server
+			$camera_data->motion_config = createMotionFile($camera_data);
+			$json_data = json_encode($camera_data, JSON_PRETTY_PRINT);
+			addThread($camera_data->motion_id, $camera_data->motion_config);
+		}
+		else if(!$existing_motion_id && $camera_data->motion_id) { //if we are adding an exisitng camera to the motion server
+			$camera_data->motion_config = createMotionFile($camera_data);
+			$json_data = json_encode($camera_data, JSON_PRETTY_PRINT);
+			addThread($camera_data->motion_id, $camera_data->motion_config);
+		}
+		else if($existing_motion_id && ($existing_motion_id == $camera_data->motion_id)) { //if we are updating a camera and the motion server has not changed
+			$thread_number = getThreadNumber($camera_data, $motion_data);
+
+			setConfigValue($motion_data, $thread_number, 'netcam_url', $camera_data->protocol.'://'.$camera_data->server.':'.$camera_data->port.'/'.$camera_data->camera_image);
+			$auth_info = '';
+			if($camera_data->username) {
+				$auth_info = $camera_data->username.':';
+			}
+			if($camera_data->password) {
+				$auth_info .= $camera_data->password;
+			}
+			setConfigValue($motion_data, $thread_number, 'netcam_userpass', $auth_info);
+			writeConfigValue($motion_data, $thread_number);
+
 		}
 		file_put_contents($new_path.'camera.json', $json_data);
 		chmod($new_path.'camera.json', 0775);

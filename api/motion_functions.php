@@ -125,5 +125,42 @@
 		}
 	}
 
+	function loadMotionConfig($motion_data) {
+		$config_data = file_get_contents($motion_data->config_file);
+		$config_lines = explode("\n", $config_data);
+		$config_obj = json_decode('{}');
+		$config_obj->threads = array();
+		foreach($config_lines as $line) {
+			$line = trim($line);
+			if(strpos($line, ';') === 0 || strpos($line, '#') === 0) {
+				continue;
+			}
+			$line_parts = explode(' ', $line, 2);
+			if(count($line_parts) != 2) {
+				continue;
+			}
+			$key = trim($line_parts[0]);
+			if($key == 'thread') {
+				array_push($config_obj->threads, trim($line_parts[1]));
+			}
+			else {
+				$config_obj->{trim($key[0])} = trim($line_parts[1]);
+			}
+		}
+
+		return $config_obj;
+	}
+
+	function getThreadNumber($camera_data, $motion_data) {
+		$config_obj = loadMotionConfig($motion_data);
+		for($i = 0; $i < count($config_obj->threads); $i++) {
+			$thread_config = $config_obj->threads[$i];
+			if($thread_config == $camera_data->motion_config) {
+				return $i + 1;
+			}
+		}
+		return -1;
+	}
+
 
 ?>

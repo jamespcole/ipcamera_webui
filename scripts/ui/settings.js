@@ -174,12 +174,17 @@ App.UI.Settings = {
 
 	showCameras: function() {
 		App.API.Cameras.getCameras().then(function(data) {
-			var source = $('#cameras-template').html();
-			var template = Handlebars.compile(source);
-			var html = template(data);
-			$('#cameras').html(html);
-			App.changePage('cameras');
-			App.setActiveNav('settings_link');
+			if(data.cameras.length === 0) {
+				History.pushState({page:'edit_camera'}, null, 'edit_camera');
+			}
+			else {
+				var source = $('#cameras-template').html();
+				var template = Handlebars.compile(source);
+				var html = template(data);
+				$('#cameras').html(html);
+				App.changePage('cameras');
+				App.setActiveNav('settings_link');
+			}
 		},
 		function(error) {
 			App.changePage('cameras');

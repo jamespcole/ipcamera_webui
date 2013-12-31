@@ -177,5 +177,20 @@
 		}
 	}
 
+	function setDetectionStatus($camera_data, $status) {
+		if($camera_data->motion_id) {
+			$motion_data = loadMotionData($camera_data->motion_id);
+			$thread_number = getThreadNumber($camera_data, $motion_data);
+			if($thread_number === -1) {
+				return FALSE;
+			}
+			$status_data = file_get_contents($motion_data->url.'/'.$thread_number.'/detection/'.$status);
+			return TRUE;
+		}
+		else {
+			return FALSE;//this camera is not attached to a motion server
+		}
+	}
+
 
 ?>

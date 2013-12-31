@@ -6,8 +6,9 @@
 					{{name}}
 
 					<div class="visible-sm visible-xs pull-right">
-						<button class="btn btn-primary btn-xs pause-detection-btn" style="display:none"><span class="glyphicon glyphicon-eye-close"></span> Pause detection</button>
-						<button class="btn btn-primary btn-xs resume-detection-btn" style="display:none"><span class="glyphicon glyphicon-eye-open"></span> Resume detection</button>
+						<button class="btn btn-primary btn-xs pause-detection-btn motion-detection-btn" style="display:none" data-camera-id="{{id}}" data-status="pause"><span class="glyphicon glyphicon-eye-close"></span> Pause detection</button>
+						<button class="btn btn-primary btn-xs resume-detection-btn motion-detection-btn" style="display:none" data-camera-id="{{id}}" data-status="start"><span class="glyphicon glyphicon-eye-open"></span> Resume detection</button>
+						<div class="status-updating-loader" style="display:none">Updating...</div>
 					</div>
 				</h4>
 			</div>
@@ -15,21 +16,21 @@
 
 			<div class="">
 				<span class="visible-md visible-lg">
-					<button class="btn btn-primary btn-sm pull-right pause-detection-btn" style="display:none"><span class="glyphicon glyphicon-eye-close"></span> Pause motion detection</button>
-					<button class="btn btn-primary btn-sm pull-right resume-detection-btn" style="display:none"><span class="glyphicon glyphicon-eye-open"></span> Resume motion detection</button>
+					<button class="btn btn-primary btn-sm pull-right pause-detection-btn motion-detection-btn" style="display:none" data-camera-id="{{id}}" data-status="pause"><span class="glyphicon glyphicon-eye-close"></span> Pause motion detection</button>
+					<button class="btn btn-primary btn-sm pull-right resume-detection-btn motion-detection-btn" style="display:none" data-camera-id="{{id}}" data-status="start"><span class="glyphicon glyphicon-eye-open"></span> Resume motion detection</button>
+					<div class="status-updating-loader" style="display:none">Updating...</div>
 				</span>
 				{{#if commands}}
-
-						<div class="col-md-12">
-							{{#each commands}}
-									<a class="camera-command btn btn-default" data-command-url="{{full_command_url}}">
-										{{#if command_icon}}
-											<span class="{{command_icon}}"></span>
-										{{/if}}
-										{{button_text}}
-									</a>
-							{{/each}}
-						</div>
+					<div class="col-md-12">
+						{{#each commands}}
+								<a class="camera-command btn btn-default" data-command-url="{{full_command_url}}">
+									{{#if command_icon}}
+										<span class="{{command_icon}}"></span>
+									{{/if}}
+									{{button_text}}
+								</a>
+						{{/each}}
+					</div>
 				{{/if}}
 			</div>
 		</div>

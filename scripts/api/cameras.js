@@ -88,6 +88,23 @@ App.API.Cameras = {
 			}
 		});
 		return dfd;
+	},
+
+	setDetectionStatus: function(params) {
+		var dfd = new jQuery.Deferred();
+		params['action'] = 'change_detection_status';
+		$.get(App.API_URL + 'cameras.php', params, function(data) {
+			dfd.resolve(data);
+		}).fail(function(data) {
+			if(data.responseJSON) {
+				dfd.reject(data.responseJSON);
+			}
+			else {
+				dfd.reject(data.responseText);
+				alert(data.responseText);
+			}
+		});
+		return dfd;
 	}
 
 };

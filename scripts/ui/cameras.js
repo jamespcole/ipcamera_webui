@@ -130,7 +130,6 @@ App.UI.Cameras = {
 			App.UI.Cameras.getHistory({camera_id: camera_id});
 			if(camera.motion_id) {
 				App.API.Cameras.getDetectionStatus({camera_id: camera_id}).then(function(data) {
-					console.log(data);
 					if(data.detection_status == 'ACTIVE') {
 						$("#view_camera .pause-detection-btn").show();
 						$("#view_camera .resume-detection-btn").hide();
@@ -396,6 +395,52 @@ $( document ).ready(function() {
 		},
 		function(error) {
 			target.show();
+			if(error.message) {
+				App.showGlobalError("Could not connect to API", error.message, true);
+			}
+			else {
+				App.showGlobalError("Could not connect to API", "An error occurred while trying to communicate with the API.", true);
+			}
+
+		});
+	});
+
+	$(document).on('click', '.motion-detection-btn', function( event ) {
+		var target = $(this);
+		var camera_id = target.data('camera-id');
+		var status = target.data('status');
+
+		var params = {
+			camera_id: camera_id,
+			new_status: status
+		};
+		$("#view_camera .pause-detection-btn").hide();
+		$("#view_camera .resume-detection-btn").hide();
+		$("#view_camera .status-updating-loader").show();
+		App.API.Cameras.setDetectionStatus(params).then(function(data) {
+			if(data.result) {
+				if(status == 'pause') {
+					$("#view_camera .pause-detection-btn").hide();
+					$("#view_camera .resume-detection-btn").show();
+				}
+				else if(status == 'start') {
+					$("#view_camera .pause-detection-btn").show();
+					$("#view_camera .resume-detection-btn").hide();
+				}
+			}
+			$("#view_camera .status-updating-loader").hide();
+		},
+		function(error) {
+			if(status == 'pause') {
+				$("#view_camera .pause-detection-btn").show();
+				$("#view_camera .resume-detection-btn").hide();
+			}
+			else if(status == 'start') {
+				$("#view_camera .pause-detection-btn").hide();
+				$("#view_camera .resume-detection-btn").show();
+			}
+			$("#view_camera .status-updating-loader").hide();
+
 			if(error.message) {
 				App.showGlobalError("Could not connect to API", error.message, true);
 			}

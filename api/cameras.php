@@ -209,6 +209,30 @@ else if(isset($_GET['action'])) {
 				throw new Exception('The specified camera could not be found');
 			}
 		}
+		else if($action == "change_detection_status") {
+			if(!isset($_GET['camera_id'])) {
+				throw new Exception('No camera id was passed');
+			}
+			$camera_id = $_GET['camera_id'];
+			if(!isset($_GET['new_status'])) {
+				throw new Exception('No status was passed');
+			}
+			$new_status = $_GET['new_status'];
+			if($new_status != 'start' &&  $new_status != 'pause') {
+				throw new Exception('The new_status parameter must be either start or pause');
+			}
+
+			$json_file = $path.$camera_id.'/camera.json';
+			if(file_exists($json_file)) {
+				$camera_data = json_decode(file_get_contents($json_file));
+				$results['result'] = setDetectionStatus($camera_data, $new_status);
+				echo json_encode($results);
+				die();
+			}
+			else {
+				throw new Exception('The specified camera could not be found');
+			}
+		}
 	}
 	catch(Exception $ex) {
 		$results['result'] = 'error';

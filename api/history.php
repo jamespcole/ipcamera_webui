@@ -21,10 +21,25 @@
 					throw new Exception('The requested camera id does not exist.');
 				}
 
+				$page = 1;
+				$rpp = 9;
+
+				if(!empty($_GET['page'])) {
+					$page = $_GET['page'];
+				}
+
+				if(!empty($_GET['rpp'])) {
+					$rpp = $_GET['rpp'];
+				}
+
+				$end = $page * $rpp;
+				$start = ($page - 1) * $rpp;
+
 				$results['dates'] = array();
 				$results['events'] = array();
 				$history_dir = CAMERA_DATA_PATH.'/'.$camera_id.'/history';
 				$contents = scandir($history_dir, SCANDIR_SORT_DESCENDING);
+				$count = 0;
 				foreach($contents as $item) {
 					if($item == '.' || $item == '..') {
 						continue;
@@ -37,16 +52,28 @@
 						if($event == '.' || $event == '..') {
 							continue;
 						}
-						$event_data = getEventInfo($history_dir.'/'.$item.'/'.$event, $event, $item, $camera_id);
-						$event_data['date'] = $item;
-						$event_data['event_id'] = $event;
-						$event_data['camera_id'] = $camera_id;
+						if($count >= $start) {
+							$event_data = getEventInfo($history_dir.'/'.$item.'/'.$event, $event, $item, $camera_id);
+							$event_data['date'] = $item;
+							$event_data['event_id'] = $event;
+							$event_data['camera_id'] = $camera_id;
+							array_push($results['events'], $event_data);
+							if(count($results['events']) == $rpp) {
+								break;
+							}
+						}
 						//$event_data['time'] = getEventTimeInfo($history_dir.'/'.$item.'/'.$event);
-						array_push($results['events'], $event_data);
+						$count++;
 					}
-
-
+					if(count($results['events']) == $rpp) {
+						break;
+					}
 				}
+				$results['count'] = $count;
+				$results['start'] = $start;
+				$results['end'] = $end;
+				$results['rpp'] = $rpp;
+				$results['page'] = $page;
 
 			}
 			catch(Exception $ex) {

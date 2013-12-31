@@ -128,7 +128,28 @@ App.UI.Cameras = {
 				App.camera_updaters['active_camera_image'] = updater;
 			}
 			App.UI.Cameras.getHistory({camera_id: camera_id});
+			if(camera.motion_id) {
+				App.API.Cameras.getDetectionStatus({camera_id: camera_id}).then(function(data) {
+					console.log(data);
+					if(data.detection_status == 'ACTIVE') {
+						$("#view_camera .pause-detection-btn").show();
+						$("#view_camera .resume-detection-btn").hide();
+					}
+					else if(data.detection_status == 'PAUSE') {
+						$("#view_camera .pause-detection-btn").hide();
+						$("#view_camera .resume-detection-btn").show();
+					}
+				},
+				function(error) {
+					if(error.message) {
+						App.showGlobalError("Could not connect to API", error.message, true);
+					}
+					else {
+						App.showGlobalError("Could not connect to API", "An error occurred while trying to communicate with the API.", true);
+					}
 
+				});
+			}
 		});
 	},
 
@@ -340,6 +361,41 @@ $( document ).ready(function() {
 			$('#event_info .modal-body').html(html);
 		},
 		function(error) {
+			if(error.message) {
+				App.showGlobalError("Could not connect to API", error.message, true);
+			}
+			else {
+				App.showGlobalError("Could not connect to API", "An error occurred while trying to communicate with the API.", true);
+			}
+
+		});
+	});
+
+	$(document).on('click', '.more-events-btn', function( event ) {
+		var target = $(this);
+		var camera_id = target.data('camera-id');
+		var page = target.data('page');
+		var rpp = target.data('rpp');
+
+		var params = {
+			camera_id: camera_id,
+			page: page + 1,
+			rpp: rpp
+		};
+		target.hide();
+		App.API.Cameras.getHistory(params).then(function(history) {
+			var source = $('#history-template').html();
+			var template = Handlebars.compile(source);
+			var html = template(history);
+			$('#camera_history').append(html);
+			if(history.events.length == rpp) {
+				target.show();
+			}
+			target.data('page', page + 1);
+			//console.log(history);
+		},
+		function(error) {
+			target.show();
 			if(error.message) {
 				App.showGlobalError("Could not connect to API", error.message, true);
 			}

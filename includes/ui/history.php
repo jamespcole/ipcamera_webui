@@ -1,15 +1,14 @@
 <script id="history-template" type="text/x-handlebars-template">
-	<h1>History</h1>
 	{{#each events}}
-	<div class="col-md-4 col-sm-4">
-		<div class="well">
-			{{dateTimeFormat start date_type="timestamp"}}
-			<a href="" class="show-event-link" data-toggle="modal" data-target="#event_info" data-camera-id="{{camera_id}}" data-event-id="{{event_id}}" data-date="{{date}}">
-				<img  class="img-thumbnail" src="{{preview}}" />
-			</a>
-			<a href="view_event/{{camera_id}}/{{date}}/{{event_id}}" class="btn btn-primary btn-sm">View</a>
+		<div class="col-md-4 col-sm-4">
+			<div class="well">
+				{{dateTimeFormat start date_type="timestamp"}}
+				<a href="" class="show-event-link" data-toggle="modal" data-target="#event_info" data-camera-id="{{camera_id}}" data-event-id="{{event_id}}" data-date="{{date}}">
+					<img  class="img-thumbnail" src="{{preview}}" />
+				</a>
+				<a href="view_event/{{camera_id}}/{{date}}/{{event_id}}" class="btn btn-primary btn-sm">View</a>
+			</div>
 		</div>
-	</div>
 	{{/each}}
 </script>
 <div class="modal fade" id="event_info" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">

@@ -187,6 +187,38 @@ else if(isset($_GET['id'])) {
 		}
 	}
 }
+else if(isset($_GET['action'])) {
+	$results = array();
+	$action = $_GET['action'];
+	try {
+		header('Content-Type: application/json');
+		if($action == 'detection_status') {
+			if(!isset($_GET['camera_id'])) {
+				throw new Exception('No camera id was passed');
+			}
+			$camera_id = $_GET['camera_id'];
+			$json_file = $path.$camera_id.'/camera.json';
+
+			if(file_exists($json_file)) {
+				$camera_data = json_decode(file_get_contents($json_file));
+				$results['detection_status'] = getDetectionStatus($camera_data);
+				echo json_encode($results);
+				die();
+			}
+			else {
+				throw new Exception('The specified camera could not be found');
+			}
+		}
+	}
+	catch(Exception $ex) {
+		$results['result'] = 'error';
+		$results['message'] = $ex->getMessage();
+		header("HTTP/1.1 403 Unauthorized" );
+		echo json_encode($results);
+		die();
+	}
+
+}
 else {
 	$contents = scandir($path);
 	$result['cameras'] = array();

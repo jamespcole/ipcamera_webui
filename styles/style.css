@@ -22,3 +22,17 @@
 #view_event .slider {
 	width:100%;
 }
+
+@media (max-width: 768px) {
+	.camera-view.row .well {
+		padding-top:0px;
+		padding-left:3px;
+		padding-right:3px;
+		border-radius:0px;
+	}
+
+	.camera-view.row .well .img-thumbnail {
+		padding:0px;
+		border-radius:0px;
+	}
+}

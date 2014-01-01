@@ -3,6 +3,7 @@ var App = {
 	camera_updaters: [],
 	current_user: null,
 	ajax_requests: 0,
+	camera_models: null,
 
 	renderCameras: function() {
 

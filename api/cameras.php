@@ -234,6 +234,18 @@ else if(isset($_GET['action'])) {
 				throw new Exception('The specified camera could not be found');
 			}
 		}
+		else if($action == "get_camera_models") {
+			$json_file = DATA_PATH.'/camera_models.json';
+			if(file_exists($json_file)) {
+				$camera_models_data = json_decode(file_get_contents($json_file));
+				$results = $camera_models_data;
+				echo json_encode($results);
+				die();
+			}
+			else {
+				throw new Exception('The camera models file could not be found');
+			}
+		}
 	}
 	catch(Exception $ex) {
 		$results['result'] = 'error';

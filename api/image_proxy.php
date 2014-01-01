@@ -79,7 +79,10 @@
 		register_shutdown_function('stopScript', $_GET['camera_id']);
 		//echo $_GET['snapshot'];
 		//die();
+		//echo $image_url;
 		$info = getImageInfo($image_url);
+		//print_r($info);
+		//die();
 		if(isset($_GET['snapshot']) && $_GET['snapshot'] == 'true') {
 			if($info['type'] == 'MJPEG') {
 				getSnapshot($info['boundary'], $image_url);
@@ -96,9 +99,15 @@
 			}*/
 
 			if($info['type'] == 'MJPEG') {
-				$headers = get_headers($image_url, 1);
+				/*$headers = get_headers($image_url, 1);
+				print_r($headers);
+				die();
 				if(isset($headers['Content-Type'])) {
 					header('Content-Type: '.$headers['Content-Type']);
+				}*/
+				$headers = get_headers($image_url);
+				foreach($headers as $header) {
+					header($header);
 				}
 				readfile($image_url);
 			}
@@ -209,6 +218,9 @@
 							$boundary_parts = explode('=', $ctype_bit);
 							if(count($boundary_parts) > 1) {
 								$result['boundary'] = trim($boundary_parts[1]);
+								if(strpos($result['boundary'], '--') !== 0) {
+									$result['boundary'] = '--'.$result['boundary'];
+								}
 							}
 						}
 					}

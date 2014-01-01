@@ -1,73 +1,86 @@
 App.UI.Cameras = {
 	showAddCamera: function(camera_id, motion_id, thread_number) {
-		if(camera_id) {
-			App.API.Cameras.getCamera(camera_id, true).then(function(data) {
-				var camera = data.camera;
-				camera['motion_servers'] = data.motion_servers;
-				var source = $('#add_camera-template').html();
-				var template = Handlebars.compile(source);
-				var html = template(camera);
-				$('#add_camera').html(html);
+		App.API.Cameras.getCameraModels({}).then(function(camera_models) {
+			if(camera_id) {
+				App.API.Cameras.getCamera(camera_id, true).then(function(data) {
+					var camera = data.camera;
+					camera['motion_servers'] = data.motion_servers;
+					camera['camera_models'] = App.camera_models;
+					var source = $('#add_camera-template').html();
+					var template = Handlebars.compile(source);
+					var html = template(camera);
+					$('#add_camera').html(html);
 
-				$('#edit_camera_protocol').val(data.camera.protocol);
-				$('#edit_camera_motion_id').val(data.camera.motion_id);
+					$('#edit_camera_protocol').val(data.camera.protocol);
+					$('#edit_camera_motion_id').val(data.camera.motion_id);
 
-				if(camera.proxy_data === true) {
-					$('#edit_proxy_data').attr('checked', 'checked');
-				}
-				if(camera.commands) {
-					for(var i = 0; i < camera.commands.length; i++) {
-						var command = camera.commands[i];
-						App.UI.Cameras.addCommandForm(command, i);
+					if(camera.proxy_data === true) {
+						$('#edit_proxy_data').attr('checked', 'checked');
 					}
-				}
-				App.changePage('add_camera');
-				App.setActiveNav('settings_link');
-			});
-		}
-		else if(motion_id && thread_number !== null) {
-			App.API.Motion.getThread(motion_id, thread_number).then(function(data) {
-				var camera = data.thread;
-				var source = $('#add_camera-template').html();
-				var template = Handlebars.compile(source);
-				var html = template(camera);
-				$('#add_camera').html(html);
-				if(camera.proxy_data === true) {
-					$('#edit_proxy_data').attr('checked', 'checked');
-				}
-				if(camera.commands) {
-					for(var i = 0; i < camera.commands.length; i++) {
-						var command = camera.commands[i];
-						App.UI.Cameras.addCommandForm(command, i);
+					if(camera.commands) {
+						for(var i = 0; i < camera.commands.length; i++) {
+							var command = camera.commands[i];
+							App.UI.Cameras.addCommandForm(command, i);
+						}
 					}
-				}
-				$('#edit_proxy_data').attr('checked', 'checked');
-				App.changePage('add_camera');
-				App.setActiveNav('settings_link');
-			});
-		}
-		else {
-			App.API.Motion.getMotionServers().then(function(data) {
-				data['port'] = 80;
-				var source = $('#add_camera-template').html();
-				var template = Handlebars.compile(source);
-				var html = template(data);
-				$('#add_camera').html(html);
-				$('#edit_proxy_data').attr('checked', 'checked');
-				App.changePage('add_camera');
-				App.setActiveNav('settings_link');
-			},
-			function(error) {
-				if(error.message) {
-					App.showGlobalError("Could not connect to API", error.message, true);
-				}
-				else {
-					App.showGlobalError("Could not connect to API", "An error occurred while trying to communicate with the API.", true);
-				}
+					App.changePage('add_camera');
+					App.setActiveNav('settings_link');
+				});
+			}
+			else if(motion_id && thread_number !== null) {
+				App.API.Motion.getThread(motion_id, thread_number).then(function(data) {
+					var camera = data.thread;
+					camera['camera_models'] = App.camera_models;
+					var source = $('#add_camera-template').html();
+					var template = Handlebars.compile(source);
+					var html = template(camera);
+					$('#add_camera').html(html);
+					if(camera.proxy_data === true) {
+						$('#edit_proxy_data').attr('checked', 'checked');
+					}
+					if(camera.commands) {
+						for(var i = 0; i < camera.commands.length; i++) {
+							var command = camera.commands[i];
+							App.UI.Cameras.addCommandForm(command, i);
+						}
+					}
+					$('#edit_proxy_data').attr('checked', 'checked');
+					App.changePage('add_camera');
+					App.setActiveNav('settings_link');
+				});
+			}
+			else {
+				App.API.Motion.getMotionServers().then(function(data) {
+					data['port'] = 80;
+					data['camera_models'] = App.camera_models;
+					var source = $('#add_camera-template').html();
+					var template = Handlebars.compile(source);
+					var html = template(data);
+					$('#add_camera').html(html);
+					$('#edit_proxy_data').attr('checked', 'checked');
+					App.changePage('add_camera');
+					App.setActiveNav('settings_link');
+				},
+				function(error) {
+					if(error.message) {
+						App.showGlobalError("Could not connect to API", error.message, true);
+					}
+					else {
+						App.showGlobalError("Could not connect to API", "An error occurred while trying to communicate with the API.", true);
+					}
 
-			});
+				});
 
-		}
+			}
+		}, function (error) {
+			if(error.message) {
+				App.showGlobalError("Could not connect to API", error.message, true);
+			}
+			else {
+				App.showGlobalError("Could not connect to API", "An error occurred while trying to communicate with the API.", true);
+			}
+		});
+
 	},
 
 	addCommandForm: function(command, index) {
@@ -455,6 +468,24 @@ $( document ).ready(function() {
 			}
 
 		});
+	});
+
+	$(document).on('change', '#edit_camera_model_id', function(event) {
+		console.log(event);
+		var model_index = $(this).find(":selected").data('index');
+		console.log(model_index);
+		var model_data = App.camera_models.cameras[model_index];
+		console.log(model_data);
+		$('#edit_camera_image').val(model_data.image_url);
+		if(model_data.commands) {
+			$('#command_list').html('');
+			for(var i = 0; i < model_data.commands.length; i++) {
+				var command = model_data.commands[i];
+				App.UI.Cameras.addCommandForm(command);
+			}
+		}
+
+
 	});
 
 	/*$(document).on('load', '.image-loading', function( event ) {

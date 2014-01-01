@@ -1,0 +1,48 @@
+{
+	"cameras": [
+		{
+			"id": 1,
+			"brand" : "D-Link",
+			"name": "DCS-930L",
+			"image_url": "mjpeg.cgi"
+		}
+		,{
+			"id": 2,
+			"brand" : "Kogan",
+			"name": "Kogan IP Camera",
+			"image_url": "videostream.cgi",
+			"commands": [
+				{
+					"command_url": "decoder_control.cgi?onestep=1&command=0",
+					"button_text": "Up",
+					"command_icon": "glyphicon glyphicon-circle-arrow-up"
+				}
+				,{
+					"command_url": "decoder_control.cgi?onestep=1&command=2",
+					"button_text": "Down",
+					"command_icon": "glyphicon glyphicon-circle-arrow-down"
+				}
+				,{
+					"command_url": "decoder_control.cgi?onestep=1&command=4",
+					"button_text": "Left",
+					"command_icon": "glyphicon glyphicon-circle-arrow-left"
+				}
+				,{
+					"command_url": "decoder_control.cgi?onestep=1&command=6",
+					"button_text": "Right",
+					"command_icon": "glyphicon glyphicon-circle-arrow-right"
+				}
+				,{
+					"command_url": "decoder_control.cgi?onestep=1&command=94",
+					"button_text": "On",
+					"command_icon": "glyphicon glyphicon-off"
+				}
+				,{
+					"command_url": "decoder_control.cgi?onestep=1&command=95",
+					"button_text": "Off",
+					"command_icon": "glyphicon glyphicon-remove-circle"
+				}
+			]
+		}
+	]
+}

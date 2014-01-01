@@ -11,6 +11,18 @@
 			<input type="hidden" id="edit_camera_is_motion_stream" name="is_motion_stream" value="{{is_motion_stream}}" />
 			<!--<input type="hidden" id="edit_camera_motion_id" name="motion_id" value="{{motion_id}}" />-->
 			<input type="hidden" id="edit_camera_thread_number" name="thread_number" value="{{thread_number}}" />
+			<div class="form-group camera-motion_server-field">
+				<label for="edit_camera_model" class="col-md-2 col-sm-2 control-label">Camera Type</label>
+				<div class="col-md-5 col-sm-7">
+					<select class="form-control" id="edit_camera_model_id" name="model_id">
+						<option value="" data-index="-1">Generic</option>
+						{{#each camera_models.cameras}}
+							<option data-index="{{@index}}" value="{{id}}">{{brand}} - {{name}}</option>
+						{{/each}}
+					</select>
+				</div>
+				<span class="help-block validation-message col-md-5 col-sm-3" style="display:none;"></span>
+			</div>
 			<div class="form-group camera-name-field">
 				<label for="edit_camera_name" class="col-md-2 col-sm-2 control-label">Name</label>
 				<div class="col-md-5 col-sm-7">
@@ -168,6 +180,8 @@
 					<option value="glyphicon glyphicon-circle-arrow-right">Right</option>
 					<option value="glyphicon glyphicon-circle-arrow-up">Up</option>
 					<option value="glyphicon glyphicon-circle-arrow-down">Down</option>
+					<option value="glyphicon glyphicon-off">Power</option>
+					<option value="glyphicon glyphicon-remove-circle">Remove Circle</option>
 				</select>
 			</div>
 			<span class="help-block validation-message col-md-5 col-sm-3" style="display:none;"></span>

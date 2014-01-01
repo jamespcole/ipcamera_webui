@@ -105,6 +105,27 @@ App.API.Cameras = {
 			}
 		});
 		return dfd;
+	},
+
+	getCameraModels: function(params) {
+		var dfd = new jQuery.Deferred();
+		if(App.camera_models !== null) {
+			dfd.resolve(App.camera_models);
+		}
+		params['action'] = 'get_camera_models';
+		$.get(App.API_URL + 'cameras.php', params, function(data) {
+			App.camera_models = data;
+			dfd.resolve(data);
+		}).fail(function(data) {
+			if(data.responseJSON) {
+				dfd.reject(data.responseJSON);
+			}
+			else {
+				dfd.reject(data.responseText);
+				alert(data.responseText);
+			}
+		});
+		return dfd;
 	}
 
 };

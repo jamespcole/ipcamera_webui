@@ -6,6 +6,8 @@
 	//define('BASE_URL', $base_url);
 	//print_r($_SERVER);
 	//echo BASE_URL;
+	//session_start();
+	//print_r($_SESSION);
 ?>
 <!DOCTYPE html>
 <html>

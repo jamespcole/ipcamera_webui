@@ -41,6 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	$camera_data->base_url = $_POST['base_url'];
 	$camera_data->motion_id = ($_POST['motion_id'] == 'none') ? '' : $_POST['motion_id'];
 	$camera_data->thread_number = $_POST['thread_number'];
+	$camera_data->model_id = $_POST['model_id'];
 
 	if(isset($_POST['proxy_data']) && $_POST['proxy_data'] == 'on') {
 		$camera_data->image_url = 'api/image_proxy.php?camera_id='.$new_id;
@@ -130,6 +131,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		}
 		file_put_contents($new_path.'camera.json', $json_data);
 		chmod($new_path.'camera.json', 0775);
+
+		//clear out the cached session vars
+
+		unset($_SESSION['image_url_'.$new_id]);
+		unset($_SESSION['image_info_'.$new_id]);
 
 		echo $json_data;
 		die();
@@ -239,6 +245,9 @@ else if(isset($_GET['action'])) {
 			if(file_exists($json_file)) {
 				$camera_models_data = json_decode(file_get_contents($json_file));
 				$results = $camera_models_data;
+				usort($camera_models_data->cameras, "custom_sort");
+				// Define the custom sort function
+
 				echo json_encode($results);
 				die();
 			}
@@ -337,6 +346,10 @@ function rrmdir($dir) {
 		}
 	}
 	return rmdir($dir);
+}
+
+function custom_sort($a,$b) {
+	return $a->brand.$a->name > $b->brand.$b->name;
 }
 
 header('Content-Type: application/json');

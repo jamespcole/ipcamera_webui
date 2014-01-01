@@ -32,7 +32,7 @@
 			</div>
 			<div class="form-group">
 				<label class="control-label col-md-2 col-sm-2">Protocol</label>
-				<div class="col-md-5 col-sm-6">
+				<div class="col-md-5 col-sm-7">
 					<select class="form-control" name="protocol" id="edit_camera_protocol">
 						<option value="http">HTTP</option>
 						<option value="https">HTTPS</option>

@@ -16,7 +16,7 @@
 			<div class="col-md-4 col-sm-4">
 				<div class="well image-loading camera-list-img">
 					<h4 class="pull-left">{{name}}</h4><a href="<?=BASE_URL?>view_camera/{{id}}" class="btn btn-primary btn-sm pull-right camera-view-btn" data-camera-id="{{id}}">View</a>
-					<img src="{{image_url}}" class="img-thumbnail camera-img camera-stream" data-snapshot-url="{{snapshot_url}}" id="image_{{id}}" onload="App.UI.Cameras.imageLoaded(this)" />
+					<img src="" class="img-thumbnail camera-img camera-stream" data-stream-url="{{image_url}}" data-snapshot-url="{{snapshot_url}}" id="image_{{id}}" />
 					<div class="img-thumbnail img-placeholder">
 						<div class="img-loading-text">Loading Camera...</div>
 						<div class="col-md-offset-2 col-md-8 progress progress-striped active">

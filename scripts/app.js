@@ -4,6 +4,7 @@ var App = {
 	current_user: null,
 	ajax_requests: 0,
 	camera_models: null,
+	use_streams: true,
 
 	renderCameras: function() {
 
@@ -17,13 +18,40 @@ var App = {
 			App.camera_updaters = [];
 			for(var i = 0; i < data.cameras.length; i++) {
 				var camera = data.cameras[i];
-				if(!App.camera_updaters['updater_' + camera.id]) {
-					var element = $('#image_' + camera.id);
+
+				var element = $('#image_' + camera.id);
+				element.on('load', function(event) {
+					App.UI.Cameras.imageLoaded(this);
+				});
+				if(App.use_streams) {
+					element.attr('src', element.data('stream-url'));
+
+					element.on('error', function(event) {
+						var target = $(this);
+						var camera_id = camera.id;
+						if(target.attr('src') == target.data('stream-url')) {
+							console.log('loading stream failed, falling back to polling mode');
+
+							var updater = new CameraUpdater({element: target, url: target.data('snapshot-url')});
+							updater.init();
+							updater.start();
+							App.camera_updaters['updater_' + camera_id] = updater;
+						}
+					});
+				}
+				else {
+					if(!App.camera_updaters['updater_' + camera.id]) {
+						var updater = new CameraUpdater({element: element, url: element.data('snapshot-url')});
+						updater.init();
+						updater.start();
+						App.camera_updaters['updater_' + camera.id] = updater;
+					}
+				}
 					/*var updater = new CameraUpdater({element: element, url: camera.image_url});
 					updater.init();
 					updater.start();
 					App.camera_updaters['updater_' + camera.id] = updater;*/
-				}
+
 			}
 		});
 	},
@@ -58,7 +86,7 @@ var App = {
 		App.showGlobalError(null, null, false);
 		//kill any camera stream connections that are open
 		$('.app-page.active-page .camera-stream').each(function(index, value) {
-				$(value).attr('src', '#');
+				$(value).attr('src', '');
 		});
 
 		$('.app-page').removeClass('active-page').hide();

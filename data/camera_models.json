@@ -44,5 +44,67 @@
 				}
 			]
 		}
+		,{
+			"id": 3,
+			"brand" : "7Links",
+			"name": "PX3615",
+			"image_url": "videostream.cgi",
+			"commands": [
+				{
+					"command_url": "decoder_control.cgi?onestep=1&command=0",
+					"button_text": "Up",
+					"command_icon": "glyphicon glyphicon-circle-arrow-up"
+				}
+				,{
+					"command_url": "decoder_control.cgi?onestep=1&command=2",
+					"button_text": "Down",
+					"command_icon": "glyphicon glyphicon-circle-arrow-down"
+				}
+				,{
+					"command_url": "decoder_control.cgi?onestep=1&command=4",
+					"button_text": "Left",
+					"command_icon": "glyphicon glyphicon-circle-arrow-left"
+				}
+				,{
+					"command_url": "decoder_control.cgi?onestep=1&command=6",
+					"button_text": "Right",
+					"command_icon": "glyphicon glyphicon-circle-arrow-right"
+				}
+				,{
+					"command_url": "decoder_control.cgi?onestep=1&command=94",
+					"button_text": "On",
+					"command_icon": "glyphicon glyphicon-off"
+				}
+				,{
+					"command_url": "decoder_control.cgi?onestep=1&command=95",
+					"button_text": "Off",
+					"command_icon": "glyphicon glyphicon-remove-circle"
+				}
+			]
+		}
+		,{
+			"id": 4,
+			"brand" : "D-Link",
+			"name": "DCS-932L",
+			"image_url": "mjpeg.cgi"
+		}
+		,{
+			"id": 5,
+			"brand" : "D-Link",
+			"name": "1130",
+			"image_url": "video/mjpg.cgi"
+		}
+		,{
+			"id": 6,
+			"brand" : "D-Link",
+			"name": "1130L",
+			"image_url": "video/mjpg.cgi"
+		}
+		,{
+			"id": 7,
+			"brand" : "D-Link",
+			"name": "DCS-942L",
+			"image_url": "mjpeg.cgi"
+		}
 	]
 }

@@ -13,6 +13,7 @@ App.UI.Cameras = {
 
 					$('#edit_camera_protocol').val(data.camera.protocol);
 					$('#edit_camera_motion_id').val(data.camera.motion_id);
+					$('#edit_camera_model_id').val(data.camera.model_id);
 
 					if(camera.proxy_data === true) {
 						$('#edit_proxy_data').attr('checked', 'checked');
@@ -133,13 +134,38 @@ App.UI.Cameras = {
 			App.camera_updaters = [];
 
 			var camera = data.camera;
-			if(!App.camera_updaters['updater_active_camera_image']) {
-				var element = $('#active_camera_image');
+
+			var element = $('#active_camera_image');
+			element.on('load', function(event) {
+				App.UI.Cameras.imageLoaded(this);
+			});
+			if(App.use_streams) {
+				element.on('error', function(event) {
+					var target = $(this);
+					if(target.attr('src') == target.data('stream-url')) {
+						console.log('loading stream failed, falling back to polling mode');
+
+						var updater = new CameraUpdater({element: target, url: target.data('snapshot-url')});
+						updater.init();
+						updater.start();
+						App.camera_updaters['updater_active_camera_image'] = updater;
+					}
+				});
+				element.attr('src', element.data('stream-url'));
+			}
+			else {
+				if(!App.camera_updaters['updater_active_camera_image']) {
+					var updater = new CameraUpdater({element: element, url: element.data('snapshot-url')});
+					updater.init();
+					updater.start();
+					App.camera_updaters['updater_active_camera_image'] = updater;
+				}
+			}
 				/*var updater = new CameraUpdater({element: element, url: camera.image_url});
 				updater.init();
 				updater.start();
 				App.camera_updaters['active_camera_image'] = updater;*/
-			}
+
 			App.UI.Cameras.getHistory({camera_id: camera_id});
 			if(camera.motion_id) {
 				App.API.Cameras.getDetectionStatus({camera_id: camera_id}).then(function(data) {
@@ -471,21 +497,19 @@ $( document ).ready(function() {
 	});
 
 	$(document).on('change', '#edit_camera_model_id', function(event) {
-		console.log(event);
+
 		var model_index = $(this).find(":selected").data('index');
-		console.log(model_index);
-		var model_data = App.camera_models.cameras[model_index];
-		console.log(model_data);
-		$('#edit_camera_image').val(model_data.image_url);
-		if(model_data.commands) {
-			$('#command_list').html('');
-			for(var i = 0; i < model_data.commands.length; i++) {
-				var command = model_data.commands[i];
-				App.UI.Cameras.addCommandForm(command);
+		if(model_index != -1) {
+			var model_data = App.camera_models.cameras[model_index];
+			$('#edit_camera_image').val(model_data.image_url);
+			if(model_data.commands) {
+				$('#command_list').html('');
+				for(var i = 0; i < model_data.commands.length; i++) {
+					var command = model_data.commands[i];
+					App.UI.Cameras.addCommandForm(command);
+				}
 			}
 		}
-
-
 	});
 
 	/*$(document).on('load', '.image-loading', function( event ) {

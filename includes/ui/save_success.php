@@ -3,7 +3,7 @@
 		<div class="alert alert-success col-sm-offset-2 col-sm-6">
 			<div class="row">
 				<div class="col-sm-3">
-					<img class="img-thumbnail" src={{image_url}} />
+					<img class="img-thumbnail" src={{snapshot_url}} />
 				</div>
 				<div class="col-sm-9">
 					{{#if is_new}}

@@ -122,10 +122,10 @@ App.UI.Cameras = {
 			var camera = data.camera;
 			if(!App.camera_updaters['updater_active_camera_image']) {
 				var element = $('#active_camera_image');
-				var updater = new CameraUpdater({element: element, url: camera.image_url});
+				/*var updater = new CameraUpdater({element: element, url: camera.image_url});
 				updater.init();
 				updater.start();
-				App.camera_updaters['active_camera_image'] = updater;
+				App.camera_updaters['active_camera_image'] = updater;*/
 			}
 			App.UI.Cameras.getHistory({camera_id: camera_id});
 			if(camera.motion_id) {
@@ -273,6 +273,12 @@ App.UI.Cameras = {
 			}
 
 		});
+	},
+
+	//this is a hack to get around the load event on images failing
+	//when the image is loaded into a handlebars template
+	imageLoaded: function(target) {
+		$(target).parent('.image-loading').removeClass('image-loading').addClass('image-loaded');
 	}
 
 
@@ -450,5 +456,9 @@ $( document ).ready(function() {
 
 		});
 	});
+
+	/*$(document).on('load', '.image-loading', function( event ) {
+		console.log('loaded');
+	});*/
 
 });

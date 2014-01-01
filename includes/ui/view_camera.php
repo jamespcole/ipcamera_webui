@@ -1,6 +1,6 @@
 <script id="view_camera-template" type="text/x-handlebars-template">
 	<div class="row camera-view">
-		<div class="well col-md-12">
+		<div class="well col-md-12 image-loading">
 			<div>
 				<h4>
 					{{name}}
@@ -12,7 +12,15 @@
 					</div>
 				</h4>
 			</div>
-			<img src="{{image_url}}" class="img-thumbnail center-block" id="active_camera_image" />
+			<img src="{{image_url}}" data-snapshot-url="{{snapshot_url}}" class="img-thumbnail center-block camera-stream" id="active_camera_image" onload="App.UI.Cameras.imageLoaded(this)" />
+			<div class="img-thumbnail img-placeholder">
+				<div class="img-loading-text">Loading Camera...</div>
+				<div class="col-md-offset-2 col-md-8 progress progress-striped active">
+					<div class="progress-bar"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+						<span class="sr-only">100% Complete</span>
+					</div>
+				</div>
+			</div>
 
 			<div class="">
 				<span class="visible-md visible-lg">
@@ -38,5 +46,7 @@
 	<div class="row" id="camera_history">
 
 	</div>
-	<button class="btn btn-primary col-md-offset-2 col-md-8 col-sm-12 col-xs-12 more-events-btn" data-page="1" data-rpp="9" data-camera-id="{{id}}">More</button>
+	{{#if motion_id}}
+		<button class="btn btn-primary col-md-offset-2 col-md-8 col-sm-12 col-xs-12 more-events-btn" data-page="1" data-rpp="9" data-camera-id="{{id}}">More</button>
+	{{/if}}
 </script>

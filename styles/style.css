@@ -23,6 +23,30 @@
 	width:100%;
 }
 
+.img-placeholder {
+	min-width:100%;
+}
+
+.image-loading .camera-stream  {
+	display:none;
+}
+
+.image-loaded .img-placeholder  {
+	display:none;
+}
+
+.camera-view .img-placeholder {
+	height:490px;
+	text-align: center;
+	padding-top: 20%;
+}
+
+.camera-list-img .img-placeholder {
+	height:243px;
+	text-align: center;
+	padding-top: 20%;
+}
+
 @media (max-width: 768px) {
 	.camera-view.row .well {
 		padding-top:0px;
@@ -35,4 +59,9 @@
 		padding:0px;
 		border-radius:0px;
 	}
+
+	.camera-view .img-placeholder {
+		height:100%;
+	}
+
 }

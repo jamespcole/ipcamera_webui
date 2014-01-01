@@ -2,6 +2,7 @@ var App = {
 	API_URL: BASE_URL + 'api/',
 	camera_updaters: [],
 	current_user: null,
+	ajax_requests: 0,
 
 	renderCameras: function() {
 
@@ -17,10 +18,10 @@ var App = {
 				var camera = data.cameras[i];
 				if(!App.camera_updaters['updater_' + camera.id]) {
 					var element = $('#image_' + camera.id);
-					var updater = new CameraUpdater({element: element, url: camera.image_url});
+					/*var updater = new CameraUpdater({element: element, url: camera.image_url});
 					updater.init();
 					updater.start();
-					App.camera_updaters['updater_' + camera.id] = updater;
+					App.camera_updaters['updater_' + camera.id] = updater;*/
 				}
 			}
 		});
@@ -54,11 +55,17 @@ var App = {
 
 	changePage: function(page_name) {
 		App.showGlobalError(null, null, false);
+		//kill any camera stream connections that are open
+		$('.app-page.active-page .camera-stream').each(function(index, value) {
+				$(value).attr('src', '#');
+		});
+
 		$('.app-page').removeClass('active-page').hide();
 		$('#' + page_name).show().removeClass('animated slideOutLeft').addClass('animated slideInRight active-page');
 		if($('#main_nav').is(':visible')) {
 			$('#main_nav').collapse('hide');
 		}
+
 	},
 
 	setActiveNav: function(nav_name) {
@@ -301,6 +308,32 @@ function CameraUpdater(params)  {
 
 
 $( document ).ready(function() {
+
+	//the following event handlers are to work around a chrome bug preventing
+	//ajax requests after an mjpeg stream loads
+	/*$( document ).ajaxSend(function() {
+		App.ajax_requests++;
+		$('.camera-stream').each(function(index, value) {
+			if($(value).attr('src') != '' || !$(value).is(':visible')) {
+				if(!$(value).data('stream-url')) {
+					$(value).data('stream-url', $(value).attr('src'));
+				}
+				$(value).attr('src', '');
+			}
+			$(value).attr('src', $(value).data('snapshot-url'));
+		});
+	});
+
+	$( document ).ajaxComplete(function() {
+		App.ajax_requests--;
+		if(App.ajax_requests == 0) {
+			$('.camera-stream').each(function(index, value) {
+				if($(value).is(':visible')) {
+					$(value).attr('src', $(value).data('stream-url'));
+				}
+			});
+		}
+	});*/
 
 	$.ajaxSetup({
 		statusCode: {

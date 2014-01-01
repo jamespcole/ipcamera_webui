@@ -8,7 +8,7 @@
 				<tbody>
 				{{#each cameras}}
 					<tr>
-						<td><img style="max-height:40px" src="{{image_url}}" class="img-thumbnail" /></td>
+						<td><img style="max-height:40px" src="{{snapshot_url}}" class="img-thumbnail" /></td>
 						<td><h4>{{name}}</h4></td>
 						<td>
 							<div class="pull-right">

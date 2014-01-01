@@ -44,6 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 	if(isset($_POST['proxy_data']) && $_POST['proxy_data'] == 'on') {
 		$camera_data->image_url = 'api/image_proxy.php?camera_id='.$new_id;
+		$camera_data->snapshot_url = 'api/image_proxy.php?camera_id='.$new_id.'&snapshot=true';
 		$camera_data->real_image_url = $_POST['image_url'];
 		$camera_data->proxy_data = TRUE;
 	}

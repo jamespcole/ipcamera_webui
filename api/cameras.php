@@ -55,19 +55,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		$camera_data->proxy_data = FALSE;
 	}
 
-	if(isset($_POST['command_url'])) {
-		$commands = array();
+	if(isset($_POST['update_commands']) && $_POST['update_commands'] == 'true') {
+		$camera_data->commands = array();
+		if(isset($_POST['command_url'])) {
+			$commands = array();
+			$count = 0;
+			foreach($_POST['command_url'] as $command_url) {
+				array_push($commands, array(
+					'command_url' => $_POST['command_url'][$count],
+					'button_text' => $_POST['button_text'][$count],
+					'command_icon' => $_POST['command_icon'][$count],
+					'full_command_url' => $camera_data->base_url.$_POST['command_url'][$count],
+					'status_handler' => $_POST['status_handler'][$count],
+					'before_command_handler' => $_POST['before_command_handler'][$count],
+					'after_command_handler' => $_POST['after_command_handler'][$count],
+				));
+				$count++;
+			}
+			$camera_data->commands = $commands;
+		}
+	}
+
+	if(isset($_POST['status_url'])) {
+		$status_handlers = array();
 		$count = 0;
-		foreach($_POST['command_url'] as $command_url) {
-			array_push($commands, array(
-				'command_url' => $_POST['command_url'][$count],
-				'button_text' => $_POST['button_text'][$count],
-				'command_icon' => $_POST['command_icon'][$count],
-				'full_command_url' => $camera_data->base_url.$_POST['command_url'][$count],
+		foreach($_POST['status_url'] as $status_url) {
+			array_push($status_handlers, array(
+				'status_url' => $_POST['status_url'][$count],
+				'status_parser' => $_POST['status_parser'][$count],
+				'full_status_url' => $camera_data->base_url.$_POST['status_url'][$count],
 			));
 			$count++;
 		}
-		$camera_data->commands = $commands;
+		$camera_data->status_handlers = $status_handlers;
 	}
 
 	$motion_data = null;
@@ -243,7 +263,10 @@ else if(isset($_GET['action'])) {
 		else if($action == "get_camera_models") {
 			$json_file = DATA_PATH.'/camera_models.json';
 			if(file_exists($json_file)) {
+				/*echo file_get_contents($json_file);
+				die();*/
 				$camera_models_data = json_decode(file_get_contents($json_file));
+				//print_r($camera_models_data);
 				$results = $camera_models_data;
 				usort($camera_models_data->cameras, "custom_sort");
 				// Define the custom sort function
@@ -254,6 +277,49 @@ else if(isset($_GET['action'])) {
 			else {
 				throw new Exception('The camera models file could not be found');
 			}
+		}
+		else if($action == "test_status_data") {
+			if(!isset($_GET['test_status_url'])) {
+				throw new Exception('No status url was passed');
+			}
+			$url = $_GET['test_status_url'];
+			//echo file_get_contents($url);
+			$results['result'] = file_get_contents($url);
+			echo json_encode($results);
+			die();
+		}
+		else if($action == "get_status_data") {
+			if(!isset($_GET['camera_id'])) {
+				throw new Exception('No camera id was passed');
+			}
+			$camera_id = $_GET['camera_id'];
+
+			if(!isset($_GET['status_parser_index'])) {
+				throw new Exception('No status_parser_index was passed');
+			}
+			$status_parser_index = $_GET['status_parser_index'];
+
+			$json_file = $path.$camera_id.'/camera.json';
+			if(file_exists($json_file)) {
+				$camera_data = json_decode(file_get_contents($json_file));
+				if(isset($camera_data->status_handlers)) {
+
+					if(isset($camera_data->status_handlers[$status_parser_index]) && isset($camera_data->status_handlers[$status_parser_index]->full_status_url)) {
+						$results['result'] = file_get_contents($camera_data->status_handlers[$status_parser_index]->full_status_url);
+					}
+				}
+
+				echo json_encode($results);
+				die();
+			}
+			else {
+				throw new Exception('The specified camera could not be found');
+			}
+
+			//echo file_get_contents($url);
+			$results['result'] = file_get_contents($url);
+			echo json_encode($results);
+			die();
 		}
 	}
 	catch(Exception $ex) {

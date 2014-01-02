@@ -47,6 +47,14 @@
 	padding-top: 20%;
 }
 
+.advanced-camera-option {
+	display:none;
+}
+
+.camera-settings.advanced-camera-options .advanced-camera-option {
+	display:block;
+}
+
 @media (max-width: 970px) {
 	.camera-list-img .img-placeholder {
 		height:138px;

@@ -56,6 +56,15 @@
 					<input type="password" class="form-control" id="edit_motion_password" name="password" placeholder="Password" value="{{password}}">
 				</div>
 			</div>
+			<div class="form-group">
+				<div class="col-sm-offset-2 col-sm-10">
+					<div class="checkbox">
+						<label>
+							<input type="checkbox" id="edit_motion_local_server" name="local_server"> The motion server is running on the same machine as this app
+						</label>
+					</div>
+				</div>
+			</div>
 			<div class="form-group motion-config_file-field">
 				<label for="edit_motion_config_file" class="control-label col-md-2 col-sm-2">Config Path</label>
 				<div class="col-md-5 col-sm-6">

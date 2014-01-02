@@ -63,6 +63,16 @@ App.UI.Settings = {
 		var template = Handlebars.compile(source);
 		var html = template({port: '8080', server: '127.0.0.1', 'config_file': '/etc/motion/motion.conf'});
 		$('#edit_motion').html(html);
+
+		$('#edit_motion #edit_motion_local_server').attr('checked', 'checked');
+		$('#edit_motion #edit_motion_local_server').on('change', function() {
+			if($(this).is(':checked')) {
+				$('#edit_motion #edit_motion_config_file').removeAttr('disabled');
+			}
+			else {
+				$('#edit_motion #edit_motion_config_file').attr('disabled', 'disabled');
+			}
+		});
 		App.changePage('edit_motion');
 		App.setActiveNav('settings_link');
 	},
@@ -75,6 +85,18 @@ App.UI.Settings = {
 			$('#edit_motion').html(html);
 			App.changePage('edit_motion');
 			App.setActiveNav('settings_link');
+			if(data.local_server) {
+				$('#edit_motion #edit_motion_local_server').attr('checked', 'checked');
+			}
+
+			$('#edit_motion #edit_motion_local_server').on('change', function() {
+				if($(this).is(':checked')) {
+					$('#edit_motion #edit_motion_config_file').removeAttr('disabled');
+				}
+				else {
+					$('#edit_motion #edit_motion_config_file').attr('disabled', 'disabled');
+				}
+			});
 		},
 		function(error) {
 			App.changePage('edit_motion');

@@ -34,13 +34,33 @@
 				}
 				,{
 					"command_url": "decoder_control.cgi?onestep=1&command=94",
-					"button_text": "On",
+					"button_text": "IR On",
 					"command_icon": "glyphicon glyphicon-off"
 				}
 				,{
 					"command_url": "decoder_control.cgi?onestep=1&command=95",
-					"button_text": "Off",
+					"button_text": "IR Off",
 					"command_icon": "glyphicon glyphicon-remove-circle"
+				}
+				,{
+					"command_url": "camera_control.cgi?param=1&value=48",
+					"button_text": "+",
+					"command_icon": "glyphicon glyphicon-certificate",
+					"status_handler": "function(element, status_data, command, camera_info) {\r\n\tif(status_data.brightness) {\r\n\t\tvar new_value = Number(status_data.brightness) + 16;\r\n\t\t$(element).data('next-value', new_value);\r\n\t}\r\n}",
+					"before_command_handler": "function(element, command, camera_info) {\r\n\tvar new_value = $(element).data('next-value');\r\n\tvar result = {};\r\n\tresult['command_params'] = {\r\n\t\t\"param\": 1,\r\n\t\t\"value\": new_value\r\n\t};\r\n\treturn result;\r\n}"
+				}
+				,{
+					"command_url": "camera_control.cgi?param=1&value=48",
+					"button_text": "-",
+					"command_icon": "glyphicon glyphicon-certificate",
+					"status_handler": "function(element, status_data, command, camera_info) {\r\n\tif(status_data.brightness) {\r\n\t\tvar new_value = Number(status_data.brightness) - 16;\r\n\t\tif(new_value < 0) {\r\n\t\t\t$(element).attr('disabled', 'disabled');\r\n \t\t}\r\n\t\telse {\r\n\t\t\t$(element).data('next-value', new_value);\r\n\t\t\t$(element).removeAttr('disabled', 'disabled');\r\n\t\t}\r\n\t}\r\n}",
+					"before_command_handler": "function(element, command, camera_info) {\r\n\tvar new_value = $(element).data('next-value');\r\n\tvar result = {};\r\n\tresult['command_params'] = {\r\n\t\t\"param\": 1,\r\n\t\t\"value\": new_value\r\n\t};\r\n\treturn result;\r\n}"
+				}
+			],
+			"status_handlers": [
+				{
+					"status_url": "get_camera_params.cgi",
+					"status_parser": "function(data, camera_info) {\n\tvar str = data.replace(/var /g, '');\n\tvar lines = str.split(';\\n');\n\tvar result = {};\n\tfor(var i = 0; i < lines.length; i++) {\n\t\tvar line = lines[i];\n\t\tvar parts = line.split('=');\n\t\tif(parts.length == 2) {\n\t\t\tresult[parts[0]] = parts[1];\n\t\t}\n\t}\n\treturn result;\n}"
 				}
 			]
 		}
@@ -72,12 +92,12 @@
 				}
 				,{
 					"command_url": "decoder_control.cgi?onestep=1&command=94",
-					"button_text": "On",
+					"button_text": "IR On",
 					"command_icon": "glyphicon glyphicon-off"
 				}
 				,{
 					"command_url": "decoder_control.cgi?onestep=1&command=95",
-					"button_text": "Off",
+					"button_text": "IR Off",
 					"command_icon": "glyphicon glyphicon-remove-circle"
 				}
 			]

@@ -126,6 +126,7 @@
 	<script src="<?=BASE_URL?>scripts/api/motion.js"></script>
 	<script src="<?=BASE_URL?>scripts/api/cameras.js"></script>
     <script src="<?=BASE_URL?>scripts/ui/settings.js"></script>
+    <script src="<?=BASE_URL?>scripts/ui/camera_settings.js"></script>
     <script src="<?=BASE_URL?>scripts/ui/cameras.js"></script>
     <script src="<?=BASE_URL?>scripts/jquery.history.js"></script>
     <script src="<?=BASE_URL?>scripts/vendor/slider/js/bootstrap-slider.js"></script>

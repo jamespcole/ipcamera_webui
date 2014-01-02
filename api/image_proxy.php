@@ -67,7 +67,7 @@
 			$info = $_SESSION[$info_session_key];
 		}
 
-		set_time_limit(40);
+		set_time_limit(0);
 		ignore_user_abort(false);
 		register_shutdown_function('stopScript', $_GET['camera_id']);
 
@@ -82,11 +82,23 @@
 		}
 		else {
 			if($info['type'] == 'MJPEG') {
+				ob_start();
 				$headers = get_headers($image_url);
 				foreach($headers as $header) {
 					header($header);
 				}
-				readfile($image_url);
+				//readfile($image_url);
+				$f = fopen($image_url, 'rb');
+				$chunk = '';
+				while($chunk = fread($f, 1024)) {
+					echo $chunk;
+					ob_flush();
+        			flush();
+					if(connection_aborted()) {
+						fclose($f);
+					}
+				}
+				ob_end_flush();
 			}
 			else if($info['type'] == 'JPEG') {
 				$boundary = '--ipcamera--';
@@ -95,12 +107,17 @@
 				header('Content-type: multipart/x-mixed-replace;boundary='.$boundary);
 
 				echo $boundary."\r\n";
-				while(true) {
+				$count = 0;
+				while($count < 10000000) {
 					$img = file_get_contents($image_url);
 					echo "Content-type: image/jpeg\r\n";
 					echo 'Content-Length: '.strlen($img)."\r\n\r\n";
 					echo $img."\r\n";
 					echo $boundary."\r\n";
+					if(connection_aborted()) {
+						break;
+					}
+					$count++;
 					//ob_flush();
 				}
 			}
@@ -170,10 +187,11 @@
 	}
 
 	function stopScript($params) {
-			/*$myFile = "/tmp/".time().'-'.$params.".txt";
+			/*$myFile = "/tmp/cam-".time().'-'.$params.".txt";
 		    $handle = fopen($myFile,'a');
 		    fwrite($handle,"test\n");
-		    fclose($handle);*/
+		    fclose($handle);
+		    chmod($myFile, 0775);*/
 		    exit();
 	}
 ?>

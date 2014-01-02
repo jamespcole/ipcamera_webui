@@ -3,9 +3,7 @@
 		<div class="col-md-4 col-sm-4">
 			<div class="well">
 				{{dateTimeFormat start date_type="timestamp"}}
-				<a href="" class="show-event-link" data-toggle="modal" data-target="#event_info" data-camera-id="{{camera_id}}" data-event-id="{{event_id}}" data-date="{{date}}">
 					<img  class="img-thumbnail" src="{{preview}}" />
-				</a>
 				<a href="view_event/{{camera_id}}/{{date}}/{{event_id}}" class="btn btn-primary btn-sm">View</a>
 			</div>
 		</div>

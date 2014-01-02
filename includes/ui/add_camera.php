@@ -1,11 +1,12 @@
 <script id="add_camera-template" type="text/x-handlebars-template">
-    <div class="row col-md-offset-2 col-md-10">
+    <div class="row col-md-offset-2 col-md-10 camera-settings">
     	<div class="row col-md-12 form-heading">
 	    	<h1 class=""><span class="glyphicon glyphicon-cog"></span> Camera Settings</h1>
 	 		<hr class="col-sm-8" />
     	</div>
 		<form role="form" class="form-horizontal" id="configuration_form">
 			<input type="hidden" id="edit_image_url" name="image_url" />
+			<input type="hidden" id="edit_update_commands" name="update_commands" value="true" />
 			<input type="hidden" id="edit_camera_id" name="id" value="{{id}}" />
 			<input type="hidden" id="edit_camera_base_url" name="base_url" value="{{base_url}}" />
 			<input type="hidden" id="edit_camera_is_motion_stream" name="is_motion_stream" value="{{is_motion_stream}}" />
@@ -104,6 +105,15 @@
 				</div>
 			</div>
 			<div class="form-group">
+				<div class="col-sm-offset-2 col-sm-10">
+					<div class="checkbox">
+						<label>
+							<input type="checkbox" id="edit_show_advanced"> Show advanced options
+						</label>
+					</div>
+				</div>
+			</div>
+			<div class="form-group advanced-camera-option">
 				<div class="col-md-offset-2 col-md-5 col-sm-offset-2 col-sm-7">
 					<h4>Camera Commands</h4>
 					<p>
@@ -112,12 +122,30 @@
 					</p>
 				</div>
 			</div>
-			<div id="command_list">
+			<div id="command_list" class="advanced-camera-option">
 
 			</div>
-			<div class="form-group">
+			<div class="form-group advanced-camera-option">
 				<div class="col-sm-offset-2 col-sm-5">
 					<a class="btn btn-primary add-command">Add Camera Command</a>
+				</div>
+			</div>
+			<div class="form-group advanced-camera-option">
+				<div class="col-md-offset-2 col-md-5 col-sm-offset-2 col-sm-7">
+					<h4>Status Parsers</h4>
+					<p>
+						You can retireve status information about your camera which you can display
+						or use in your camera commands.
+						Click the "Add Status Parser" button to add a new parser
+					</p>
+				</div>
+			</div>
+			<div id="status_handler_list" class="advanced-camera-option">
+
+			</div>
+			<div class="form-group advanced-camera-option">
+				<div class="col-sm-offset-2 col-sm-5">
+					<a class="btn btn-primary add-status-parser">Add Status Parser</a>
 				</div>
 			</div>
 
@@ -159,8 +187,8 @@
 <script id="command-template" type="text/x-handlebars-template">
 	<div class="command-form">
 		<div class="form-group">
-			<div class="col-sm-offset-2 col-sm-10">
-				<h4>Command {{command_display_index}}</h4>
+			<div class="col-sm-offset-2 col-sm-10 col-md-5">
+				<h4>Command {{command_display_index}} <button type="button" class="btn btn-danger btn-xs pull-right remove-command-btn">Remove</button></h4>
 			</div>
 		</div>
 
@@ -182,6 +210,7 @@
 					<option value="glyphicon glyphicon-circle-arrow-down">Down</option>
 					<option value="glyphicon glyphicon-off">Power</option>
 					<option value="glyphicon glyphicon-remove-circle">Remove Circle</option>
+					<option value="glyphicon glyphicon-certificate">Certificate</option>
 				</select>
 			</div>
 			<span class="help-block validation-message col-md-5 col-sm-3" style="display:none;"></span>
@@ -192,6 +221,66 @@
 				<input type="text" class="form-control" name="command_url[]" placeholder="Command URL" value="{{command_url}}">
 			</div>
 			<span class="help-block validation-message col-md-5 col-sm-3" style="display:none;"></span>
+		</div>
+		<div class="form-group">
+			<label class="col-md-2 col-sm-2 control-label">Status Handler</label>
+			<div class="col-md-5 col-sm-7">
+				<textarea class="form-control accepts_tab status-handler" rows="4" name="status_handler[]">{{status_handler}}</textarea>
+			</div>
+			<span class="help-block validation-message col-md-5 col-sm-3" style="display:none;"></span>
+		</div>
+		<div class="form-group">
+			<label class="col-md-2 col-sm-2 control-label">Before Command</label>
+			<div class="col-md-5 col-sm-7">
+				<textarea class="form-control accepts_tab before-command-handler" rows="4" name="before_command_handler[]">{{before_command_handler}}</textarea>
+			</div>
+			<span class="help-block validation-message col-md-5 col-sm-3" style="display:none;"></span>
+		</div>
+		<div class="form-group">
+			<label class="col-md-2 col-sm-2 control-label">After Command</label>
+			<div class="col-md-5 col-sm-7">
+				<textarea class="form-control accepts_tab after-command-handler" rows="4" name="after_command_handler[]">{{after_command_handler}}</textarea>
+			</div>
+			<span class="help-block validation-message col-md-5 col-sm-3" style="display:none;"></span>
+		</div>
+	</div>
+</script>
+<script id="status_handler-template" type="text/x-handlebars-template">
+	<div class="status-handler-form">
+		<div class="form-group">
+			<div class="col-sm-offset-2 col-sm-10 col-md-5">
+				<h4>Status Handler  <button type="button" class="btn btn-danger btn-xs pull-right remove-status-handler-btn">Remove</button></h4>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label class="col-md-2 col-sm-2 control-label">Button Text</label>
+			<div class="col-md-5 col-sm-7">
+				<input type="text" class="form-control status-url" name="status_url[]" placeholder="Button Text" value="{{status_url}}">
+			</div>
+			<span class="help-block validation-message col-md-5 col-sm-3" style="display:none;"></span>
+		</div>
+		<div class="form-group">
+			<label class="col-md-2 col-sm-2 control-label">Parser</label>
+			<div class="col-md-5 col-sm-7">
+				<textarea class="form-control accepts_tab status-parser" rows="12" name="status_parser[]">{{status_parser}}</textarea>
+			</div>
+			<span class="help-block validation-message col-md-5 col-sm-3" style="display:none;"></span>
+		</div>
+		<div class="form-group" style="display:none">
+			<label class="col-md-2 col-sm-2 control-label">Test Output</label>
+			<div class="col-md-5 col-sm-7">
+				<textarea class="form-control accepts_tab status-parser-result" rows="12" disabled="disabled"></textarea>
+			</div>
+			<span class="help-block validation-message col-md-5 col-sm-3" style="display:none;"></span>
+		</div>
+		<div class="form-group">
+			<div class="col-md-offset-2 col-md-5 col-sm-offset-2 col-sm-7">
+				<hr />
+				<div class="pull-right">
+					<a class="btn btn-success test-handler-btn">Test Handler</a>
+				</div>
+			</div>
 		</div>
 	</div>
 </script>

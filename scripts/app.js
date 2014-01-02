@@ -85,16 +85,25 @@ var App = {
 	changePage: function(page_name) {
 		App.showGlobalError(null, null, false);
 		//kill any camera stream connections that are open
-		$('.app-page.active-page .camera-stream').each(function(index, value) {
-				$(value).attr('src', '');
-		});
+		//$('.app-page.active-page .camera-stream').each(function(index, value) {
+				//$(value).attr('src', '');
+		//		$(value).remove();
+		//});
 
 		$('.app-page').removeClass('active-page').hide();
 		$('#' + page_name).show().removeClass('animated slideOutLeft').addClass('animated slideInRight active-page');
 		if($('#main_nav').is(':visible')) {
 			$('#main_nav').collapse('hide');
 		}
+		//:not()
+		//kill any camera stream connections that are open
+		$('.app-page:not(.active-page) .camera-stream').each(function(index, value) {
+			//console.log(value);
+			//console.log('removed image from ' + $(value).closest('.app-page').attr('id'));
+			$(value).attr('src', '');
+			$(value).remove();
 
+		});
 	},
 
 	setActiveNav: function(nav_name) {
@@ -252,7 +261,7 @@ App.UI.FirstRun = {
 
 App.API = {
 	login: function(form_data) {
-		console.log(form_data);
+		//console.log(form_data);
 		var dfd = new jQuery.Deferred();
 		$.post(App.API_URL + 'login.php', form_data, function(data) {
 			dfd.resolve(data);
@@ -405,28 +414,28 @@ $( document ).ready(function() {
 	App.Router.addRoute({
 		url: 'edit_camera',
 		navigate: function(params) {
-			App.UI.Cameras.showAddCamera();
+			App.UI.CameraSettings.showAddCamera();
 		}
 	});
 
 	App.Router.addRoute({
 		url: 'edit_camera/:camera_id',
 		navigate: function(params) {
-			App.UI.Cameras.showAddCamera(params.camera_id);
+			App.UI.CameraSettings.showAddCamera(params.camera_id);
 		}
 	});
 
 	App.Router.addRoute({
 		url: 'import_camera/:motion_id/:thread_number',
 		navigate: function(params) {
-			App.UI.Cameras.showAddCamera(null, params.motion_id, params.thread_number);
+			App.UI.CameraSettings.showAddCamera(null, params.motion_id, params.thread_number);
 		}
 	});
 
 	App.Router.addRoute({
 		url: 'add_camera',
 		navigate: function(params) {
-			App.UI.Cameras.showAddCamera();
+			App.UI.CameraSettings.showAddCamera();
 		}
 	});
 
@@ -490,7 +499,7 @@ $( document ).ready(function() {
 		url: 'save_success/:camera_id',
 		navigate: function(params) {
 			params['is_new'] = false;
-			App.UI.Cameras.showConfigurationSaveSuccess(params);
+			App.UI.CameraSettings.showConfigurationSaveSuccess(params);
 		}
 	});
 
@@ -498,7 +507,7 @@ $( document ).ready(function() {
 		url: 'create_success/:camera_id',
 		navigate: function(params) {
 			params['is_new'] = true;
-			App.UI.Cameras.showConfigurationSaveSuccess(params);
+			App.UI.CameraSettings.showConfigurationSaveSuccess(params);
 		}
 	});
 
@@ -555,6 +564,9 @@ $( document ).ready(function() {
 		/*if(href.indexOf(BASE_URL) !== 0) {
 			return;
 		}*/
+		if(href.indexOf(BASE_URL) !== 0) {
+			href = BASE_URL + href;
+		}
 		e.preventDefault();
 
 		//$('.app-page.active-page').addClass('animated slideOutLeft');

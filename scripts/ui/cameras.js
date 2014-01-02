@@ -1,116 +1,47 @@
 App.UI.Cameras = {
-	showAddCamera: function(camera_id, motion_id, thread_number) {
-		App.API.Cameras.getCameraModels({}).then(function(camera_models) {
-			if(camera_id) {
-				App.API.Cameras.getCamera(camera_id, true).then(function(data) {
-					var camera = data.camera;
-					camera['motion_servers'] = data.motion_servers;
-					camera['camera_models'] = App.camera_models;
-					var source = $('#add_camera-template').html();
-					var template = Handlebars.compile(source);
-					var html = template(camera);
-					$('#add_camera').html(html);
+	current_camera:null,
 
-					$('#edit_camera_protocol').val(data.camera.protocol);
-					$('#edit_camera_motion_id').val(data.camera.motion_id);
-					$('#edit_camera_model_id').val(data.camera.model_id);
+	updateStatus: function() {
+		for(var i = 0; i < App.UI.Cameras.current_camera.status_handlers.length; i++) {
+			var status_handler = App.UI.Cameras.current_camera.status_handlers[i];
+			App.API.Cameras.getStatusData({
+					camera_id: App.UI.Cameras.current_camera.id,
+					status_parser_index: i
+				}).then(function(data) {
+				var parser = eval('var fn = ' + status_handler.status_parser);
+				var status_data = fn(data.result, App.UI.Cameras.current_camera);
+				$('.camera-command').each(function(key, val) {
+					//console.log(val);
+					var command = App.UI.Cameras.current_camera.commands[$(val).data('command-index')];
+					//var func_str = $(val).data('status-handler');
+					var func_str = command.status_handler;
+					if(func_str) {
+						var status_handler = eval('var fnStatusHandler = ' + func_str);
+						var result = fnStatusHandler($(val), status_data, command, App.UI.Cameras.current_camera);
+					}
 
-					if(camera.proxy_data === true) {
-						$('#edit_proxy_data').attr('checked', 'checked');
+					/*var func_str = $(val).data('status-handler');
+					if(!func_str) {
+						continue++;
 					}
-					if(camera.commands) {
-						for(var i = 0; i < camera.commands.length; i++) {
-							var command = camera.commands[i];
-							App.UI.Cameras.addCommandForm(command, i);
-						}
-					}
-					App.changePage('add_camera');
-					App.setActiveNav('settings_link');
+					var parser = eval('var fn = ' + func_str);
+					var result = fn($(val), );*/
 				});
-			}
-			else if(motion_id && thread_number !== null) {
-				App.API.Motion.getThread(motion_id, thread_number).then(function(data) {
-					var camera = data.thread;
-					camera['camera_models'] = App.camera_models;
-					var source = $('#add_camera-template').html();
-					var template = Handlebars.compile(source);
-					var html = template(camera);
-					$('#add_camera').html(html);
-					if(camera.proxy_data === true) {
-						$('#edit_proxy_data').attr('checked', 'checked');
-					}
-					if(camera.commands) {
-						for(var i = 0; i < camera.commands.length; i++) {
-							var command = camera.commands[i];
-							App.UI.Cameras.addCommandForm(command, i);
-						}
-					}
-					$('#edit_proxy_data').attr('checked', 'checked');
-					App.changePage('add_camera');
-					App.setActiveNav('settings_link');
-				});
-			}
-			else {
-				App.API.Motion.getMotionServers().then(function(data) {
-					data['port'] = 80;
-					data['camera_models'] = App.camera_models;
-					var source = $('#add_camera-template').html();
-					var template = Handlebars.compile(source);
-					var html = template(data);
-					$('#add_camera').html(html);
-					$('#edit_proxy_data').attr('checked', 'checked');
-					App.changePage('add_camera');
-					App.setActiveNav('settings_link');
-				},
-				function(error) {
-					if(error.message) {
-						App.showGlobalError("Could not connect to API", error.message, true);
-					}
-					else {
-						App.showGlobalError("Could not connect to API", "An error occurred while trying to communicate with the API.", true);
-					}
-
-				});
-
-			}
-		}, function (error) {
-			if(error.message) {
-				App.showGlobalError("Could not connect to API", error.message, true);
-			}
-			else {
-				App.showGlobalError("Could not connect to API", "An error occurred while trying to communicate with the API.", true);
-			}
-		});
-
-	},
-
-	addCommandForm: function(command, index) {
-		var source = $('#command-template').html();
-		var template = Handlebars.compile(source);
-		if(!command) {
-			command = {};
-		}
-		if(!index) {
-			index = $('.command-form').length;
-		}
-		command['command_index'] = index;
-		command['command_display_index'] = index + 1;
-
-		var html = template(command);
-
-		$('#command_list').append(html);
-		var icon_select = $('#command_list .command-icon-select')[index];
-		if(command.command_icon) {
-			$(icon_select).val(command.command_icon);
+			});
 		}
 	},
 
 	getHistory: function(params) {
+		params['page'] = 1;
+		params['rpp'] = $('#view_camera .more-events-btn').data('rpp');
 		App.API.Cameras.getHistory(params).then(function(history) {
 			var source = $('#history-template').html();
 			var template = Handlebars.compile(source);
 			var html = template(history);
 			$('#camera_history').append(html);
+			if(history.events.length == params['rpp']) {
+				$('#view_camera .more-events-btn').show();
+			}
 		},
 		function(error) {
 			if(error.message) {
@@ -119,12 +50,13 @@ App.UI.Cameras = {
 			else {
 				App.showGlobalError("Could not connect to API", "An error occurred while trying to communicate with the API.", true);
 			}
-
+			$('#view_camera .more-events-btn').show();
 		});
 	},
 
 	renderCamera: function(camera_id) {
 		App.API.Cameras.getCamera(camera_id).then(function(data) {
+			App.UI.Cameras.current_camera = data.camera;
 			var source   = $("#view_camera-template").html();
 			var template = Handlebars.compile(source);
 			var html    = template(data.camera);
@@ -165,7 +97,7 @@ App.UI.Cameras = {
 				updater.init();
 				updater.start();
 				App.camera_updaters['active_camera_image'] = updater;*/
-
+			App.UI.Cameras.updateStatus();
 			App.UI.Cameras.getHistory({camera_id: camera_id});
 			if(camera.motion_id) {
 				App.API.Cameras.getDetectionStatus({camera_id: camera_id}).then(function(data) {
@@ -192,7 +124,6 @@ App.UI.Cameras = {
 	},
 
 	viewEvent: function(params) {
-		console.log(params);
 		App.API.Cameras.getEventData(params).then(function(data) {
 			var source   = $("#view_event-template").html();
 			var template = Handlebars.compile(source);
@@ -292,28 +223,6 @@ App.UI.Cameras = {
 		//setTimeout(1000, App.UI.Cameras.startVideo(view_element, frames));
 	},
 
-	showConfigurationSaveSuccess: function(params) {
-		App.API.Cameras.getCamera(params.camera_id).then(function(data) {
-			var camera = data.camera;
-			camera['is_new'] = params.is_new;
-			var source = $('#save_success-template').html();
-			var template = Handlebars.compile(source);
-			var html = template(camera);
-			$('#save_success').html(html);
-			App.changePage('save_success');
-			App.setActiveNav('settings_link');
-		},
-		function(error) {
-			if(error.message) {
-				App.showGlobalError("Could not connect to API", error.message, true);
-			}
-			else {
-				App.showGlobalError("Could not connect to API", "An error occurred while trying to communicate with the API.", true);
-			}
-
-		});
-	},
-
 	//this is a hack to get around the load event on images failing
 	//when the image is loaded into a handlebars template
 	imageLoaded: function(target) {
@@ -324,95 +233,61 @@ App.UI.Cameras = {
 };
 
 $( document ).ready(function() {
-	$(document).on('click', '.add-command', function(e) {
-		App.UI.Cameras.addCommandForm();
-	});
-
-	$(document).on('click', '.delete-camera-link', function(e) {
-		var camera_id = $(this).data('camera-id');
-		App.deleteCamera(camera_id);
-	});
 
 	$(document).on('click', '.camera-command', function(e) {
+
+		var command_index = $(this).data('command-index');
+		var command = App.UI.Cameras.current_camera.commands[command_index];
+
+		var func_str = command.before_command_handler;
+		var command_params = '';
+		if(func_str) {
+			var before_command_handler = eval('var fnBeforeCommandHandler = ' + func_str);
+			var result = fnBeforeCommandHandler($(this), command, App.UI.Cameras.current_camera);
+			if(result && result.command_params) {
+				command_params = result.command_params;
+			}
+		}
+
 		var c_url = $(this).data('command-url');
-		$.get(App.API_URL + 'command_proxy.php', {command_url: c_url});
-	});
-	$(document).on('click', '#test_config_btn', function(e) {
-		App.testConfiguration();
-	});
+		var camera_id = $(this).data('camera-id');
 
-	$(document).on('submit', '#configuration_form', function( event ) {
-		event.preventDefault();
-		var url = App.getConfiguredCameraUrl();
-
-		$('#edit_image_url').val(App.getConfiguredCameraUrl() + $('#edit_camera_image').val());
-		$('#edit_camera_base_url').val(url);
-
-		//hide the validation errors before trying to save
-		$('#configuration_form .form-group').removeClass('has-error');
-		$('#configuration_form .validation-message').html('').hide();
-		App.showGlobalError(null, null, false);
-
-		App.API.Cameras.saveConfiguration($(this).serialize()).then(function(data) {
-			var camera_id = $('#edit_camera_id').val();
-			var is_new = (camera_id) ? false : true;
-			console.log(data);
-			//App.showConfigurationSaveSuccess(data, is_new);
-			if(is_new) {
-				History.pushState({page:'create_success/' + data.camera_id}, null, 'create_success/' + data.id);
-			}
-			else {
-				History.pushState({page:'save_success/' + data.camera_id}, null, 'save_success/' + data.id);
-			}
-
-		},
-		function(error_data) {
-			if(error_data.errors) {
-				for(var i = 0; i < error_data.errors.length; i++) {
-					var error = error_data.errors[i];
-					if(error.type == 'global') {
-						App.showGlobalError(error.message, error.reason);
-					}
-					else if(error.type == 'field') {
-						var form_element = $('.camera-' + error.name + '-field');
-
-						form_element.addClass('has-error');
-						form_element.find('.validation-message').html(error.message).show();
-					}
-				}
-			}
-		});
-	});
-
-	$(document).on('click', '.show-event-link', function( event ) {
-		var target = $(this);
-		console.log(target);
-		var camera_id = target.data('camera-id');
-		var event_id = target.data('event-id');
-		var date = target.data('date');
-
+		/*$.get(App.API_URL + 'command_proxy.php', {
+			command_url: c_url,
+			command_index: command_index,
+			camera_id: camera_id
+		});*/
 		var params = {
+			//command_url: c_url,
+			command_index: command_index,
 			camera_id: camera_id,
-			event_id: event_id,
-			date: date
+			action: 'send_camera_command'
 		};
-
-		App.API.Cameras.getEventData(params).then(function(data) {
-			console.log(data);
-			var source = $('#event_info-template').html();
-			var template = Handlebars.compile(source);
-			var html = template(data);
-			$('#event_info .modal-body').html(html);
+		if(command_params) {
+			params.command_params = JSON.stringify(command_params);
+		}
+		$(this).attr('disabled', 'disabled');
+		var element = this;
+		App.API.Cameras.sendCameraCommand(params).then(function(command_result) {
+			$(element).removeAttr('disabled');
+			App.UI.Cameras.updateStatus();
+			var func_str = command.after_command_handler;
+			if(func_str) {
+				var after_command_handler = eval('var fnAfterCommandHandler = ' + func_str);
+				var result = fnAfterCommandHandler($(element), command, App.UI.Cameras.current_camera, command_result);
+			}
 		},
 		function(error) {
+			$(element).removeAttr('disabled');
 			if(error.message) {
 				App.showGlobalError("Could not connect to API", error.message, true);
 			}
 			else {
 				App.showGlobalError("Could not connect to API", "An error occurred while trying to communicate with the API.", true);
 			}
-
 		});
+
+
 	});
 
 	$(document).on('click', '.more-events-btn', function( event ) {
@@ -495,25 +370,5 @@ $( document ).ready(function() {
 
 		});
 	});
-
-	$(document).on('change', '#edit_camera_model_id', function(event) {
-
-		var model_index = $(this).find(":selected").data('index');
-		if(model_index != -1) {
-			var model_data = App.camera_models.cameras[model_index];
-			$('#edit_camera_image').val(model_data.image_url);
-			if(model_data.commands) {
-				$('#command_list').html('');
-				for(var i = 0; i < model_data.commands.length; i++) {
-					var command = model_data.commands[i];
-					App.UI.Cameras.addCommandForm(command);
-				}
-			}
-		}
-	});
-
-	/*$(document).on('load', '.image-loading', function( event ) {
-		console.log('loaded');
-	});*/
 
 });

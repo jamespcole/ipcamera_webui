@@ -24,6 +24,22 @@ App.API.Cameras = {
 		return dfd;
 	},
 
+	sendCameraCommand: function(params) {
+		var dfd = new jQuery.Deferred();
+		$.get(App.API_URL + 'command_proxy.php', params, function(data) {
+			dfd.resolve(data);
+		}).fail(function(data) {
+			if(data.responseJSON) {
+				dfd.reject(data.responseJSON);
+			}
+			else {
+				dfd.reject(data.responseText);
+				alert(data.responseText);
+			}
+		});
+		return dfd;
+	},
+
 	saveConfiguration: function(form_data) {
 		var dfd = new jQuery.Deferred();
 		$.post(App.API_URL + 'cameras.php', form_data, function(data) {
@@ -111,6 +127,7 @@ App.API.Cameras = {
 		var dfd = new jQuery.Deferred();
 		if(App.camera_models !== null) {
 			dfd.resolve(App.camera_models);
+			return dfd;
 		}
 		params['action'] = 'get_camera_models';
 		$.get(App.API_URL + 'cameras.php', params, function(data) {
@@ -126,6 +143,41 @@ App.API.Cameras = {
 			}
 		});
 		return dfd;
+	},
+
+	getTestStatusData: function(params) {
+		var dfd = new jQuery.Deferred();
+		params['action'] = 'test_status_data';
+		$.get(App.API_URL + 'cameras.php', params, function(data) {
+			dfd.resolve(data);
+		}).fail(function(data) {
+			if(data.responseJSON) {
+				dfd.reject(data.responseJSON);
+			}
+			else {
+				dfd.reject(data.responseText);
+				alert(data.responseText);
+			}
+		});
+		return dfd;
+	},
+
+	getStatusData: function(params) {
+		var dfd = new jQuery.Deferred();
+		params['action'] = 'get_status_data';
+		$.get(App.API_URL + 'cameras.php', params, function(data) {
+			dfd.resolve(data);
+		}).fail(function(data) {
+			if(data.responseJSON) {
+				dfd.reject(data.responseJSON);
+			}
+			else {
+				dfd.reject(data.responseText);
+				alert(data.responseText);
+			}
+		});
+		return dfd;
 	}
+
 
 };

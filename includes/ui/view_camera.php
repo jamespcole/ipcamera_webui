@@ -31,11 +31,13 @@
 				{{#if commands}}
 					<div class="col-md-12">
 						{{#each commands}}
-								<a class="camera-command btn btn-default" data-command-url="{{full_command_url}}">
+								<a class="camera-command btn btn-default" data-command-index="{{@index}}" data-command-url="{{command_url}}" data-camera-id="{{../id}}">
 									{{#if command_icon}}
 										<span class="{{command_icon}}"></span>
 									{{/if}}
+									<span class="btn-text">
 									{{button_text}}
+									</span>
 								</a>
 						{{/each}}
 					</div>
@@ -47,6 +49,6 @@
 
 	</div>
 	{{#if motion_id}}
-		<button class="btn btn-primary col-md-offset-2 col-md-8 col-sm-12 col-xs-12 more-events-btn" data-page="1" data-rpp="9" data-camera-id="{{id}}">More</button>
+		<button class="btn btn-primary col-md-offset-2 col-md-8 col-sm-12 col-xs-12 more-events-btn" style="display:none" data-page="1" data-rpp="9" data-camera-id="{{id}}">More</button>
 	{{/if}}
 </script>

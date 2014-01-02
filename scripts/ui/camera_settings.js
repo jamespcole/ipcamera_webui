@@ -28,14 +28,16 @@ App.UI.CameraSettings = {
 						show_advanced = true;
 						for(var i = 0; i < camera.commands.length; i++) {
 							var command = camera.commands[i];
-							App.UI.CameraSettings.addCommandForm(command, i);
+							//App.UI.CameraSettings.addCommandForm(command, i);
+							App.UI.CameraSettings.addCommandRow(command);
 						}
 					}
 					if(camera.status_handlers) {
 						show_advanced = true;
 						for(var i = 0; i < camera.status_handlers.length; i++) {
 							var status_handler = camera.status_handlers[i];
-							App.UI.CameraSettings.addStatusHandlerForm(status_handler, i);
+							//App.UI.CameraSettings.addStatusHandlerForm(status_handler, i);
+							App.UI.CameraSettings.addStatusParserRow(status_handler);
 						}
 					}
 					if(show_advanced) {
@@ -68,13 +70,15 @@ App.UI.CameraSettings = {
 					if(camera.commands) {
 						for(var i = 0; i < camera.commands.length; i++) {
 							var command = camera.commands[i];
-							App.UI.CameraSettings.addCommandForm(command, i);
+							//App.UI.CameraSettings.addCommandForm(command, i);
+							App.UI.CameraSettings.addCommandRow(command);
 						}
 					}
 					if(camera.status_handlers) {
 						for(var i = 0; i < camera.status_handlers.length; i++) {
 							var status_handler = camera.status_handlers[i];
-							App.UI.CameraSettings.addStatusHandlerForm(status_handler, i);
+							//App.UI.CameraSettings.addStatusHandlerForm(status_handler, i);
+							App.UI.CameraSettings.addStatusParserRow(status_handler);
 						}
 					}
 					$('#edit_proxy_data').attr('checked', 'checked');
@@ -134,7 +138,7 @@ App.UI.CameraSettings = {
 
 	},
 
-	addCommandForm: function(command, index) {
+	/*addCommandForm: function(command, index) {
 		var source = $('#command-template').html();
 		var template = Handlebars.compile(source);
 		if(!command) {
@@ -178,27 +182,109 @@ App.UI.CameraSettings = {
 		}
 
 
+	},*/
+
+	addCommandForm: function(command, index) {
+		$('#edit_command_modal').modal('show');
+		var source = $('#command-template').html();
+		var template = Handlebars.compile(source);
+		if(!command) {
+			command = {};
+		}
+		if(!index) {
+			//index = $('.command-form').length;
+			index = 0;
+		}
+		command['command_index'] = index;
+		command['command_display_index'] = index + 1;
+
+		if(!command.status_handler) {
+			command.status_handler = App.UI.CameraSettings.default_status_handler;
+		}
+
+		if(!command.before_command_handler) {
+			command.before_command_handler = App.UI.CameraSettings.default_before_command_handler;
+		}
+
+		if(!command.after_command_handler) {
+			command.after_command_handler = App.UI.CameraSettings.default_after_command_handler;
+		}
+
+		var html = template(command);
+		$('#edit_command_modal .modal-body .edit-command-form').html(html);
+		//var inserted_form = $('#command_list').append(html).find('.command-form').last();
+
+		/*inserted_form.find('.remove-command-btn').on('click', function(e) {
+			if(confirm('Dow you really want to remove this command?')) {
+				$(this).closest('.command-form').fadeOut({
+					duration: 'slow',
+					complete: function(e) {
+						$(this).remove();
+					}
+				});
+			}
+		});*/
+
+		var icon_select = $('#edit_command_modal .modal-body .command-icon-select')[index];
+		if(command.command_icon) {
+			$(icon_select).val(command.command_icon);
+		}
+
+
 	},
 
-	addStatusHandlerForm: function(status_handler, index) {
-		var source = $('#status_handler-template').html();
+	addCommandRow: function(command, index) {
+		var source = $('#command-row-template').html();
 		var template = Handlebars.compile(source);
-		if(!status_handler) {
-			status_handler = {};
+
+		var html = template(command);
+
+		if(index && index !== 0) {
+			var row = $('#commands_table tbody tr')[index];
+			$(row).replaceWith(html);
 		}
-		var html = template(status_handler);
-		$('#status_handler_list').append(html);
-		$('#status_handler_list .test-handler-btn').on('click', function(event) {
+		else {
+			$('#commands_table tbody').append(html);
+		}
+	},
+
+	addStatusParserRow: function(status_parser, index) {
+		var source = $('#status-parser-row-template').html();
+		var template = Handlebars.compile(source);
+
+		var html = template(status_parser);
+
+		if(index && index !== 0) {
+			var row = $('#status_parsers_table tbody tr')[index];
+			$(row).replaceWith(html);
+		}
+		else {
+			$('#status_parsers_table tbody').append(html);
+		}
+	},
+
+
+	addStatusParserForm: function(status_parser, index) {
+		$('#edit_status_parser_modal').modal('show');
+		var source = $('#status_parser-template').html();
+		var template = Handlebars.compile(source);
+		if(!status_parser) {
+			status_parser = {};
+		}
+		var html = template(status_parser);
+		$('#edit_status_parser_modal .modal-body .edit-status-parser-form').html(html);
+
+		$('#edit_status_parser_modal .test-parser-btn').on('click', function(event) {
 			var target = this;
 			var base_url = App.getConfiguredCameraUrl();
-			var image_url = $(this).closest('.status-handler-form').find('.status-url').val();
+			var image_url = $(this).closest('.status-parser-form').find('.status-url').val();
 			var url = base_url + image_url;
-			var status_parser = $(this).closest('.status-handler-form').find('.status-parser').val();
+			var status_parser = $(this).closest('.status-parser-form').find('.status-parser').val();
 			App.API.Cameras.getTestStatusData({test_status_url: url}).then(function(data) {
 				try {
 					var parser = eval('var fn = ' + status_parser);
 					var result = fn(data.result);
-					$(target).closest('.status-handler-form').find('.status-parser-result').val(JSON.stringify(result, null, "\t")).closest('.form-group').show();
+					$(target).closest('.status-parser-form').find('.status-parser-result').val(JSON.stringify(result, null, "\t")).closest('.form-group').show();
 				}
 				catch(ex) {
 					console.log(JSON.stringify(ex));
@@ -206,9 +292,6 @@ App.UI.CameraSettings = {
 			}, function(error) {
 				console.log(error);
 			});
-
-
-
 		});
 	},
 
@@ -246,6 +329,7 @@ App.UI.CameraSettings = {
 
 $( document ).ready(function() {
 	$(document).on('click', '.add-command', function(e) {
+		//App.UI.CameraSettings.addCommandForm();
 		App.UI.CameraSettings.addCommandForm();
 	});
 
@@ -273,7 +357,6 @@ $( document ).ready(function() {
 		App.API.Cameras.saveConfiguration($(this).serialize()).then(function(data) {
 			var camera_id = $('#edit_camera_id').val();
 			var is_new = (camera_id) ? false : true;
-			console.log(data);
 			//App.showConfigurationSaveSuccess(data, is_new);
 			if(is_new) {
 				History.pushState({page:'create_success/' + data.camera_id}, null, 'create_success/' + data.id);
@@ -311,15 +394,15 @@ $( document ).ready(function() {
 			var model_data = App.camera_models.cameras[model_index];
 			$('#edit_camera_image').val(model_data.image_url);
 			if(!camera_id) {
-				$('#command_list').html('');
+				$('#commands_table tbody').html('');
 				$('#status_handler_list').html('');
 			}
 			if(model_data.commands) {
 				show_advanced = true;
-				$('#command_list').html('');
+				$('#commands_table tbody').html('');
 				for(var i = 0; i < model_data.commands.length; i++) {
 					var command = model_data.commands[i];
-					App.UI.CameraSettings.addCommandForm(command);
+					App.UI.CameraSettings.addCommandRow(command);
 				}
 			}
 
@@ -328,7 +411,8 @@ $( document ).ready(function() {
 				$('#status_handler_list').html('');
 				for(var i = 0; i < model_data.status_handlers.length; i++) {
 					var status_handler = model_data.status_handlers[i];
-					App.UI.CameraSettings.addStatusHandlerForm(status_handler);
+					//App.UI.CameraSettings.addStatusHandlerForm(status_handler);
+					App.UI.CameraSettings.addStatusParserRow(status_handler);
 				}
 			}
 
@@ -361,6 +445,106 @@ $( document ).ready(function() {
 		}
 	});
 
+	$(document).on('click', '.show-command-edit-modal', function(e) {
+
+		var parent_row = $(this).parents('tr');
+		var index = parent_row.parent().find('tr').index(parent_row);
+		var command = {};
+		command.row_index = index;
+		command.button_text = parent_row.find('.command-form-fields .button_text').val();
+		command.command_icon = parent_row.find('.command-form-fields .command_icon').val();
+		command.command_url = parent_row.find('.command-form-fields .command_url').val();
+		command.status_handler = parent_row.find('.command-form-fields .status_handler').val();
+		command.before_command_handler = parent_row.find('.command-form-fields .before_command_handler').val();
+		command.after_command_handler = parent_row.find('.command-form-fields .after_command_handler').val();
+		//var command = App.UI.CameraSettings.current_camera.commands[i];
+		App.UI.CameraSettings.addCommandForm(command);
+	});
+
+	$(document).on('click', '.save-command-edit-modal', function(e) {
+		var index = $('#edit_command_modal .row_index').val();
+		var parent_row = $('#commands_table').find('tr')[index];
+		var fields = $(parent_row).find('.command-form-fields');
+
+		var form_fields = $('#edit_command_modal .command-form');
+		var command = {};
+		command.row_index = index;
+		command.button_text = form_fields.find('.button_text').val();
+		command.command_icon = form_fields.find('.command_icon').val();
+		command.command_url = form_fields.find('.command_url').val();
+		command.status_handler = form_fields.find('.status_handler').val();
+		command.before_command_handler = form_fields.find('.before_command_handler').val();
+		command.after_command_handler = form_fields.find('.after_command_handler').val();
+
+		//var command = {};
+		/*fields.find('.button_text').val(command.button_text);
+		fields.find('.command_icon').val(command.command_icon);
+		fields.find('.command_url').val(command.command_url);
+		fields.find('.status_handler').val(command.status_handler);
+		fields.find('.before_command_handler').val(command.before_command_handler);
+		fields.find('.after_command_handler').val(command.after_command_handler);*/
+		App.UI.CameraSettings.addCommandRow(command, index);
+
+		$('#edit_command_modal').modal('hide');
+		//var command = App.UI.CameraSettings.current_camera.commands[i];
+		//App.UI.CameraSettings.addCommandForm2(command);
+	});
+
+	$(document).on('click', '.delete-command-btn', function(e) {
+		if(confirm('Do you really want to remove this command?')) {
+			$(this).parents('tr').fadeOut({
+				duration: 'slow',
+				complete: function(e) {
+					$(this).remove();
+				}
+			});
+		}
+	});
+
+	$(document).on('click', '.show-status-parser-edit-modal', function(e) {
+
+		var parent_row = $(this).parents('tr');
+		var index = parent_row.parent().find('tr').index(parent_row);
+		var fields = $(parent_row).find('.status-parser-form-fields');
+		var status_parser = {};
+		status_parser.row_index = index;
+		status_parser.status_url = fields.find('.status_url').val();
+		status_parser.status_parser = fields.find('.status_parser').val();
+
+		//var command = App.UI.CameraSettings.current_camera.commands[i];
+		App.UI.CameraSettings.addStatusParserForm(status_parser);
+	});
+
+	$(document).on('click', '.save-status-parser-edit-modal', function(e) {
+		var index = $('#edit_status_parser_modal .row_index').val();
+		var parent_row = $('#status_parsers_table').find('tr')[index];
+		var fields = $(parent_row).find('.status-parser-form-fields');
+
+		var form_fields = $('#edit_status_parser_modal .status-parser-form');
+		var status_parser = {};
+		status_parser.row_index = index;
+		status_parser.status_url = form_fields.find('.status_url').val();
+		status_parser.status_parser = form_fields.find('.status_parser').val();
+
+		App.UI.CameraSettings.addStatusParserRow(status_parser, index);
+
+		$('#edit_status_parser_modal').modal('hide');
+	});
+
+	$(document).on('click', '.delete-status-parser-btn', function(e) {
+		if(confirm('Do you really want to remove this status parser?')) {
+			$(this).parents('tr').fadeOut({
+				duration: 'slow',
+				complete: function(e) {
+					$(this).remove();
+				}
+			});
+		}
+	});
+
+	$(document).on('click', '.add-status-parser', function(e) {
+		App.UI.CameraSettings.addStatusParserForm();
+	});
 	/*$(document).on('load', '.image-loading', function( event ) {
 		console.log('loaded');
 	});*/

@@ -239,6 +239,12 @@
 		$motion_data->url = $_POST['url'];
 		$motion_data->protocol = $_POST['protocol'];
 		$motion_data->config_file = $_POST['config_file'];
+		if(isset($_POST['local_server']) && $_POST['local_server'] == 'on') {
+			$motion_data->local_server = true;
+		}
+		else {
+			$motion_data->local_server = false;
+		}
 
 		header('Content-Type: application/json');
 		$json_data = json_encode($motion_data, JSON_PRETTY_PRINT);

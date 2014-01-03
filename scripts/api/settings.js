@@ -11,7 +11,7 @@ App.API.Settings = {
 			}
 			else {
 				dfd.reject(data.responseText);
-				alert(data.responseText);
+				console.log(data.responseText);
 			}
 		});
 		return dfd;
@@ -27,7 +27,7 @@ App.API.Settings = {
 			}
 			else {
 				dfd.reject(data.responseText);
-				alert(data.responseText);
+				console.log(data.responseText);
 			}
 		});
 		return dfd;

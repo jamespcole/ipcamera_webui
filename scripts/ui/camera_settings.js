@@ -24,7 +24,7 @@ App.UI.CameraSettings = {
 						$('#edit_proxy_data').attr('checked', 'checked');
 					}
 					var show_advanced = false;
-					if(camera.commands) {
+					if(camera.commands && camera.commands.length > 0) {
 						show_advanced = true;
 						for(var i = 0; i < camera.commands.length; i++) {
 							var command = camera.commands[i];
@@ -32,7 +32,7 @@ App.UI.CameraSettings = {
 							App.UI.CameraSettings.addCommandRow(command);
 						}
 					}
-					if(camera.status_handlers) {
+					if(camera.status_handlers && camera.status_handlers.length > 0) {
 						show_advanced = true;
 						for(var i = 0; i < camera.status_handlers.length; i++) {
 							var status_handler = camera.status_handlers[i];
@@ -67,14 +67,14 @@ App.UI.CameraSettings = {
 					if(camera.proxy_data === true) {
 						$('#edit_proxy_data').attr('checked', 'checked');
 					}
-					if(camera.commands) {
+					if(camera.commands && camera.commands.length > 0) {
 						for(var i = 0; i < camera.commands.length; i++) {
 							var command = camera.commands[i];
 							//App.UI.CameraSettings.addCommandForm(command, i);
 							App.UI.CameraSettings.addCommandRow(command);
 						}
 					}
-					if(camera.status_handlers) {
+					if(camera.status_handlers && camera.status_handlers.length > 0) {
 						for(var i = 0; i < camera.status_handlers.length; i++) {
 							var status_handler = camera.status_handlers[i];
 							//App.UI.CameraSettings.addStatusHandlerForm(status_handler, i);

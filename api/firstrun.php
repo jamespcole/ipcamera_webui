@@ -21,7 +21,7 @@
 				$result['name'] = 'Data directory is not writeable';
 				$result['result'] = 'danger';
 				$result['description'] = 'The data directory does not have the correct permissions';
-				$result['resolution'] = 'To fix this error you need to run the command "chmod -R a+w '.DATA_PATH.'"';
+				$result['resolution'] = 'To fix this error you need to run the command "sudo chown -R www-data:www-data '.DATA_PATH.'" then "sudo chmod -R g+rw '.DATA_PATH.'"';
 			}
 			array_push($results['checks'], $result);
 

@@ -2,32 +2,34 @@ App.UI.Cameras = {
 	current_camera:null,
 
 	updateStatus: function() {
-		for(var i = 0; i < App.UI.Cameras.current_camera.status_handlers.length; i++) {
-			var status_handler = App.UI.Cameras.current_camera.status_handlers[i];
-			App.API.Cameras.getStatusData({
-					camera_id: App.UI.Cameras.current_camera.id,
-					status_parser_index: i
-				}).then(function(data) {
-				var parser = eval('var fn = ' + status_handler.status_parser);
-				var status_data = fn(data.result, App.UI.Cameras.current_camera);
-				$('.camera-command').each(function(key, val) {
-					//console.log(val);
-					var command = App.UI.Cameras.current_camera.commands[$(val).data('command-index')];
-					//var func_str = $(val).data('status-handler');
-					var func_str = command.status_handler;
-					if(func_str) {
-						var status_handler = eval('var fnStatusHandler = ' + func_str);
-						var result = fnStatusHandler($(val), status_data, command, App.UI.Cameras.current_camera);
-					}
+		if(App.UI.Cameras.current_camera.status_handlers) {
+			for(var i = 0; i < App.UI.Cameras.current_camera.status_handlers.length; i++) {
+				var status_handler = App.UI.Cameras.current_camera.status_handlers[i];
+				App.API.Cameras.getStatusData({
+						camera_id: App.UI.Cameras.current_camera.id,
+						status_parser_index: i
+					}).then(function(data) {
+					var parser = eval('var fn = ' + status_handler.status_parser);
+					var status_data = fn(data.result, App.UI.Cameras.current_camera);
+					$('.camera-command').each(function(key, val) {
+						//console.log(val);
+						var command = App.UI.Cameras.current_camera.commands[$(val).data('command-index')];
+						//var func_str = $(val).data('status-handler');
+						var func_str = command.status_handler;
+						if(func_str) {
+							var status_handler = eval('var fnStatusHandler = ' + func_str);
+							var result = fnStatusHandler($(val), status_data, command, App.UI.Cameras.current_camera);
+						}
 
-					/*var func_str = $(val).data('status-handler');
-					if(!func_str) {
-						continue++;
-					}
-					var parser = eval('var fn = ' + func_str);
-					var result = fn($(val), );*/
+						/*var func_str = $(val).data('status-handler');
+						if(!func_str) {
+							continue++;
+						}
+						var parser = eval('var fn = ' + func_str);
+						var result = fn($(val), );*/
+					});
 				});
-			});
+			}
 		}
 	},
 

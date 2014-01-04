@@ -245,11 +245,11 @@ App.UI.CameraSettings = {
 		$('#edit_command_modal .modal-dialog').addClass('command-type-' + $(type_select).val());
 
 		type_select.on('change', function(e) {
-			$('#edit_command_modal .modal-dialog').removeClass('command-type-text command-type-button command-type-group command-type-placeholder');
+			$('#edit_command_modal .modal-dialog').removeClass('command-type-text command-type-button command-type-group command-type-placeholder command-type-panel');
 			$('#edit_command_modal .modal-dialog').addClass('command-type-' + $(this).val());
 		});
 
-		$('#edit_command_modal .modal-dialog').removeClass('command-type-text command-type-button command-type-group command-type-placeholder');
+		$('#edit_command_modal .modal-dialog').removeClass('command-type-text command-type-button command-type-group command-type-placeholder command-type-panel');
 		$('#edit_command_modal .modal-dialog').addClass('command-type-' + $(type_select).val());
 
 		var group_type_select = $('#edit_command_modal .modal-body .command-group-type-select');
@@ -283,6 +283,7 @@ App.UI.CameraSettings = {
 		else {
 			$('#commands_table tbody').append(html);
 		}
+		$('#commands_table').show();
 	},
 
 	addStatusParserRow: function(status_parser, index) {
@@ -298,6 +299,7 @@ App.UI.CameraSettings = {
 		else {
 			$('#status_parsers_table tbody').append(html);
 		}
+		$('#status_parsers_table').show();
 	},
 
 

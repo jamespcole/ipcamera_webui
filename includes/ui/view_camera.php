@@ -30,6 +30,7 @@
 				</span>
 				{{#if commands}}
 					<div class="col-md-12 camera-commands-list">
+						<div class="camera-command-panel panel-normal col-md-4" data-control-size="{{control_size}}">
 							<div class="camera-command-group group-normal" data-control-size="{{control_size}}">
 								{{#each commands}}
 										{{#equal command_type "button" }}
@@ -44,7 +45,6 @@
 										{{/equal}}
 										{{#equal command_type "placeholder" }}
 											<a type="button" role="button" class="camera-command btn btn-default camera-command-{{command_type}} control-size-{{control_size}}" data-command-index="{{@index}}" data-command-url="{{command_url}}" data-camera-id="{{../../id}}">
-
 												<span class="command-text">
 													--
 												</span>
@@ -54,6 +54,12 @@
 											</div>
 											<div class="camera-command-group group-{{group_type}}" data-control-size="{{control_size}}" data-command-index="{{@index}}">
 
+										{{/equal}}
+										{{#equal command_type "panel" }}
+												</div>
+											</div>
+											<div class="camera-command-panel panel-{{group_type}} col-md-4" data-control-size="{{control_size}}" data-command-index="{{@index}}">
+												<div class="camera-command-group group-normal" data-control-size="">
 										{{/equal}}
 										{{#equal command_type "text" }}
 											<span class="camera-command camera-command-{{command_type}} control-size-{{control_size}}" data-command-index="{{@index}}" data-camera-id="{{../../id}}">
@@ -67,6 +73,7 @@
 										{{/equal}}
 								{{/each}}
 							</div>
+						</div>
 					</div>
 				{{/if}}
 			</div>

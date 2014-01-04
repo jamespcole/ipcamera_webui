@@ -128,6 +128,10 @@ body.dragging, body.dragging * {
 	display:none;
 }
 
+.command-type-panel .hide-for-panel {
+	display:none;
+}
+
 .camera-command-group.group-small, .camera-command-group.group-normal {
 	display:inline-block;
 }
@@ -135,4 +139,16 @@ body.dragging, body.dragging * {
 
 .camera-command.camera-command-placeholder {
 	visibility:hidden;
+}
+
+.camera-commands-list .camera-command-panel.panel-normal {
+	text-align:center;
+}
+
+.camera-commands-list {
+	margin-top:20px;
+}
+
+.camera-command-group .group-normal {
+	margin-top:20px;
 }

@@ -43,11 +43,12 @@
 					<option value="text">Text</option>
 					<option value="group">Group</option>
 					<option value="placeholder">Placeholder</option>
+					<option value="panel">Panel</option>
 				</select>
 			</div>
 			<span class="help-block validation-message" style="display:none;"></span>
 		</div>
-		<div class="form-group hide-for-button hide-for-text hide-for-placeholder">
+		<div class="form-group hide-for-button hide-for-text hide-for-placeholder hide-for-panel">
 			<label class="control-label">Group Type</label>
 			<div class="">
 				<select class="form-control command-group-type-select group_type" name="group_type[]">
@@ -59,14 +60,14 @@
 			</div>
 			<span class="help-block validation-message" style="display:none;"></span>
 		</div>
-		<div class="form-group hide-for-placeholder">
+		<div class="form-group hide-for-placeholder hide-for-panel">
 			<label class="control-label">Button Text</label>
 			<div class="">
 				<input type="text" class="form-control button_text" name="button_text[]" placeholder="Button Text" value="{{button_text}}">
 			</div>
 			<span class="help-block validation-message" style="display:none;"></span>
 		</div>
-		<div class="form-group hide-for-placeholder">
+		<div class="form-group hide-for-placeholder hide-for-panel">
 			<label class="control-label">Icon</label>
 			<div class="">
 				<select class="form-control command-icon-select command_icon" name="command_icon[]">
@@ -82,7 +83,7 @@
 			</div>
 			<span class="help-block validation-message" style="display:none;"></span>
 		</div>
-		<div class="form-group hide-for-placeholder">
+		<div class="form-group hide-for-placeholder hide-for-panel">
 			<label class="control-label">Control Size</label>
 			<div class="">
 				<select class="form-control command-control-size-select control_size" name="control_size[]">
@@ -95,28 +96,28 @@
 			</div>
 			<span class="help-block validation-message" style="display:none;"></span>
 		</div>
-		<div class="form-group hide-for-group hide-for-text hide-for-placeholder">
+		<div class="form-group hide-for-group hide-for-text hide-for-placeholder hide-for-panel">
 			<label class="control-label">Command URL</label>
 			<div class="">
 				<input type="text" class="form-control command_url" name="command_url[]" placeholder="Command URL" value="{{command_url}}">
 			</div>
 			<span class="help-block validation-message" style="display:none;"></span>
 		</div>
-		<div class="form-group hide-for-group hide-for-placeholder">
+		<div class="form-group hide-for-group hide-for-placeholder hide-for-panel">
 			<label class="control-label">Status Handler</label>
 			<div class="">
 				<textarea class="form-control accepts_tab status-handler status_handler" rows="4" name="status_handler[]">{{status_handler}}</textarea>
 			</div>
 			<span class="help-block validation-message" style="display:none;"></span>
 		</div>
-		<div class="form-group hide-for-group hide-for-text hide-for-placeholder">
+		<div class="form-group hide-for-group hide-for-text hide-for-placeholder hide-for-panel">
 			<label class="control-label">Before Command</label>
 			<div class="">
 				<textarea class="form-control accepts_tab before-command-handler before_command_handler" rows="4" name="before_command_handler[]">{{before_command_handler}}</textarea>
 			</div>
 			<span class="help-block validation-message" style="display:none;"></span>
 		</div>
-		<div class="form-group hide-for-group hide-for-text hide-for-placeholder">
+		<div class="form-group hide-for-group hide-for-text hide-for-placeholder hide-for-panel">
 			<label class="control-label">After Command</label>
 			<div class="">
 				<textarea class="form-control accepts_tab after-command-handler after_command_handler" rows="4" name="after_command_handler[]">{{after_command_handler}}</textarea>

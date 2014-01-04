@@ -5,6 +5,7 @@
 	define('MOTION_DATA_PATH', DATA_PATH.'/motion_servers');
 	define('USER_DATA_PATH', DATA_PATH.'/user.json');
 	define('BACKUP_DATA_PATH', DATA_PATH.'/backup');
+	define('LOG_FILE_PATH', DATA_PATH.'/log.log');
 
 
 	define('FIRST_RUN', !file_exists(USER_DATA_PATH));

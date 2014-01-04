@@ -1,5 +1,6 @@
 <?
 	require_once('config.php');
+	require_once('functions.php');
 	//require_once('security.php');
 	$path = CAMERA_DATA_PATH.'/';
 	//for testing configuration before saving
@@ -19,7 +20,7 @@
 
 	}
 	else if(isset($_GET['camera_id'])) {
-
+		$log_id = $_GET['camera_id'].'-'.time();
 		$image_url = '';
 		$info = null;
 		//You can't set session info for a stream so only
@@ -69,19 +70,22 @@
 
 		set_time_limit(10);
 		ignore_user_abort(false);
-		register_shutdown_function('stopScript', $_GET['camera_id']);
+		register_shutdown_function('stopScript', $log_id);
 
 		if(isset($_GET['snapshot']) && $_GET['snapshot'] == 'true') {
 			if($info['type'] == 'MJPEG') {
+				log_info($log_id.' Started snapshot from MJPEG stream.  '.$image_url);
 				getSnapshot($info['boundary'], $image_url);
 			}
 			else {
+				log_info($log_id.' Started snapshot from JPEG.  '.$image_url);
 				header('Content-Type: image/jpeg');
 				readfile($image_url);
 			}
 		}
 		else {
 			if($info['type'] == 'MJPEG') {
+				log_info($log_id.' Started stream from MJPEG.  '.$image_url);
 				ob_start();
 				/*$headers = get_headers($image_url);
 				foreach($headers as $header) {
@@ -97,11 +101,13 @@
         			flush();
 					if(connection_aborted()) {
 						fclose($f);
+						break;
 					}
 				}
 				ob_end_flush();
 			}
 			else if($info['type'] == 'JPEG') {
+				log_info($log_id.' Started stream from JPEG.  '.$image_url);
 				$boundary = '--ipcamera--';
 
 
@@ -123,6 +129,7 @@
 				}
 			}
 		}
+		log_info($log_id.' Finished.');
 		die();
 
 	}
@@ -188,11 +195,12 @@
 	}
 
 	function stopScript($params) {
-			/*$myFile = "/tmp/cam-".time().'-'.$params.".txt";
-		    $handle = fopen($myFile,'a');
-		    fwrite($handle,"test\n");
-		    fclose($handle);
-		    chmod($myFile, 0775);*/
-		    exit();
+		log_info($params.' Aborted.');
+		/*$myFile = "/tmp/cam-".time().'-'.$params.".txt";
+	    $handle = fopen($myFile,'a');
+	    fwrite($handle,"test\n");
+	    fclose($handle);
+	    chmod($myFile, 0775);*/
+	    exit();
 	}
 ?>

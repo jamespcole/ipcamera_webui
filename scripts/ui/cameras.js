@@ -101,6 +101,7 @@ App.UI.Cameras = {
 				App.camera_updaters['active_camera_image'] = updater;*/
 			App.UI.Cameras.updateStatus();
 			App.UI.Cameras.getHistory({camera_id: camera_id});
+			App.UI.Cameras.processCameraGroups();
 			if(camera.motion_id) {
 				App.API.Cameras.getDetectionStatus({camera_id: camera_id}).then(function(data) {
 					if(data.detection_status == 'ACTIVE') {
@@ -123,6 +124,21 @@ App.UI.Cameras = {
 				});
 			}
 		});
+	},
+
+	processCameraGroups: function() {
+		var grouped = $('.camera-commands-list .camera-command-group.group-grouped').addClass('btn-group');
+		var justified = $('.camera-commands-list .camera-command-group.group-justified').addClass('btn-group btn-group-justified');
+		var vertical = $('.camera-commands-list .camera-command-group.group-vertical').addClass('btn-group-vertical');
+
+
+		//var grouped = $('.camera-commands-list .camera-command-group.camera-command-small .btn').addClass('btn-xs');
+		var groups = $('.camera-commands-list .camera-command-group');
+		groups.each(function(key, val) {
+			var control_size = $(val).data('control-size');
+			$(val).find('.btn.control-size-').addClass('btn-' + control_size);
+		});
+		//grouped.find('.command-button-holder').addClass('input-group-btn');
 	},
 
 	viewEvent: function(params) {

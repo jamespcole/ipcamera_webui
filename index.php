@@ -121,6 +121,7 @@
     <script src="<?=BASE_URL?>scripts/handlebars-v1.1.2.js"></script>
     <script src="<?=BASE_URL?>scripts/simplerouter.js"></script>
     <script src="<?=BASE_URL?>scripts/moment.min.js"></script>
+    <script src="<?=BASE_URL?>scripts/vendor/jquery-sortable.js"></script>
     <script src="<?=BASE_URL?>scripts/app.js"></script>
 	<script src="<?=BASE_URL?>scripts/api/settings.js"></script>
 	<script src="<?=BASE_URL?>scripts/api/motion.js"></script>
@@ -160,6 +161,8 @@
 	<? include('includes/ui/view_camera.php'); ?>
 	<? include('includes/ui/view_event.php'); ?>
 	<? include('includes/ui/save_success.php'); ?>
+	<? include('includes/ui/camera_command.php'); ?>
+	<? include('includes/ui/camera_parser.php'); ?>
 
 	<script id="prerequisite_check-template" type="text/x-handlebars-template">
 		<div class="col-md-offset-2 col-md-8">

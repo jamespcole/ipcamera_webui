@@ -87,3 +87,52 @@
 	}
 
 }
+
+
+/******* jQuery Draggabel ***********/
+body.dragging, body.dragging * {
+  cursor: move !important;
+}
+
+.dragged {
+  position: absolute;
+  opacity: 0.5;
+  z-index: 2000;
+}
+
+.sortable-table tr.placeholder {
+	position: relative;
+	height:40px;
+	/** More li styles **/
+}
+.sortable-table tr.placeholder:before {
+	position: absolute;
+	/** Define arrowhead **/
+}
+
+/***********   Command Controls    *************/
+
+.command-type-button .hide-for-button {
+	display:none;
+}
+
+.command-type-text .hide-for-text {
+	display:none;
+}
+
+.command-type-group .hide-for-group {
+	display:none;
+}
+
+.command-type-placeholder .hide-for-placeholder {
+	display:none;
+}
+
+.camera-command-group.group-small, .camera-command-group.group-normal {
+	display:inline-block;
+}
+
+
+.camera-command.camera-command-placeholder {
+	visibility:hidden;
+}

@@ -54,6 +54,12 @@ App.UI.CameraSettings = {
 
 					App.changePage('add_camera');
 					App.setActiveNav('settings_link');
+					$('.sortable-table').sortable({
+						containerSelector: 'table',
+						itemPath: '> tbody',
+						itemSelector: 'tr',
+						placeholder: '<tr class="placeholder"/>'
+					});
 				});
 			}
 			else if(motion_id && thread_number !== null) {
@@ -93,6 +99,12 @@ App.UI.CameraSettings = {
 							$(this).closest('.camera-settings').removeClass('advanced-camera-options');
 						}
 					});
+					$('.sortable-table').sortable({
+						containerSelector: 'table',
+						itemPath: '> tbody',
+						itemSelector: 'tr',
+						placeholder: '<tr class="placeholder"/>'
+					});
 				});
 			}
 			else {
@@ -114,6 +126,12 @@ App.UI.CameraSettings = {
 						else {
 							$(this).closest('.camera-settings').removeClass('advanced-camera-options');
 						}
+					});
+					$('.sortable-table').sortable({
+						containerSelector: 'table',
+						itemPath: '> tbody',
+						itemSelector: 'tr',
+						placeholder: '<tr class="placeholder"/>'
 					});
 				},
 				function(error) {
@@ -212,24 +230,43 @@ App.UI.CameraSettings = {
 
 		var html = template(command);
 		$('#edit_command_modal .modal-body .edit-command-form').html(html);
-		//var inserted_form = $('#command_list').append(html).find('.command-form').last();
 
-		/*inserted_form.find('.remove-command-btn').on('click', function(e) {
-			if(confirm('Dow you really want to remove this command?')) {
-				$(this).closest('.command-form').fadeOut({
-					duration: 'slow',
-					complete: function(e) {
-						$(this).remove();
-					}
-				});
-			}
-		});*/
-
-		var icon_select = $('#edit_command_modal .modal-body .command-icon-select')[index];
+		var icon_select = $('#edit_command_modal .modal-body .command-icon-select');
 		if(command.command_icon) {
 			$(icon_select).val(command.command_icon);
 		}
+		var type_select = $('#edit_command_modal .modal-body .command-type-select');
+		if(command.command_type) {
+			$(type_select).val(command.command_type);
+		}
+		else {
+			$(type_select).val('button');
+		}
+		$('#edit_command_modal .modal-dialog').addClass('command-type-' + $(type_select).val());
 
+		type_select.on('change', function(e) {
+			$('#edit_command_modal .modal-dialog').removeClass('command-type-text command-type-button command-type-group command-type-placeholder');
+			$('#edit_command_modal .modal-dialog').addClass('command-type-' + $(this).val());
+		});
+
+		$('#edit_command_modal .modal-dialog').removeClass('command-type-text command-type-button command-type-group command-type-placeholder');
+		$('#edit_command_modal .modal-dialog').addClass('command-type-' + $(type_select).val());
+
+		var group_type_select = $('#edit_command_modal .modal-body .command-group-type-select');
+		if(command.group_type) {
+			$(group_type_select).val(command.group_type);
+		}
+		else {
+			$(group_type_select).val('normal');
+		}
+
+		var control_size_select = $('#edit_command_modal .modal-body .command-control-size-select');
+		if(command.control_size) {
+			$(control_size_select).val(command.control_size);
+		}
+		else {
+			$(control_size_select).val('');
+		}
 
 	},
 
@@ -271,6 +308,9 @@ App.UI.CameraSettings = {
 		if(!status_parser) {
 			status_parser = {};
 		}
+		if(!status_parser.status_parser) {
+			status_parser.status_parser = App.UI.CameraSettings.default_status_parser;
+		}
 		var html = template(status_parser);
 		$('#edit_status_parser_modal .modal-body .edit-status-parser-form').html(html);
 
@@ -288,9 +328,11 @@ App.UI.CameraSettings = {
 				}
 				catch(ex) {
 					console.log(JSON.stringify(ex));
+					$(target).closest('.status-parser-form').find('.status-parser-result').val(ex).closest('.form-group').show();
 				}
 			}, function(error) {
 				console.log(error);
+				$(target).closest('.status-parser-form').find('.status-parser-result').val(error).closest('.form-group').show();
 			});
 		});
 	},
@@ -457,6 +499,10 @@ $( document ).ready(function() {
 		command.status_handler = parent_row.find('.command-form-fields .status_handler').val();
 		command.before_command_handler = parent_row.find('.command-form-fields .before_command_handler').val();
 		command.after_command_handler = parent_row.find('.command-form-fields .after_command_handler').val();
+		command.command_type = parent_row.find('.command-form-fields .command_type').val();
+		command.group_type = parent_row.find('.command-form-fields .group_type').val();
+		command.command_name = parent_row.find('.command-form-fields .command_name').val();
+		command.control_size = parent_row.find('.command-form-fields .control_size').val();
 		//var command = App.UI.CameraSettings.current_camera.commands[i];
 		App.UI.CameraSettings.addCommandForm(command);
 	});
@@ -475,6 +521,11 @@ $( document ).ready(function() {
 		command.status_handler = form_fields.find('.status_handler').val();
 		command.before_command_handler = form_fields.find('.before_command_handler').val();
 		command.after_command_handler = form_fields.find('.after_command_handler').val();
+		command.command_type = form_fields.find('.command_type').val();
+		command.group_type = form_fields.find('.group_type').val();
+		command.command_name = form_fields.find('.command_name').val();
+		command.control_size = form_fields.find('.control_size').val();
+
 
 		//var command = {};
 		/*fields.find('.button_text').val(command.button_text);

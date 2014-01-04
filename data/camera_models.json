@@ -12,49 +12,181 @@
 			"name": "Kogan IP Camera",
 			"image_url": "videostream.cgi",
 			"commands": [
+								{
+					"command_url": "",
+					"button_text": "",
+					"command_icon": "",
+					"command_type": "group",
+					"group_type": "vertical",
+					"control_size": "lg",
+					"command_name": "Directions"
+				},
+				{
+					"command_url": "",
+					"button_text": "",
+					"command_icon": "",
+					"command_type": "placeholder",
+					"group_type": "normal",
+					"control_size": "",
+					"command_name": "Placeholder"
+				},
+				{
+					"command_url": "decoder_control.cgi?onestep=1&command=4",
+					"button_text": "",
+					"command_icon": "glyphicon glyphicon-circle-arrow-left",
+					"command_type": "button",
+					"group_type": "normal",
+					"control_size": "",
+					"command_name": "Left"
+				},
+				{
+					"command_url": "",
+					"button_text": "",
+					"command_icon": "",
+					"command_type": "placeholder",
+					"group_type": "normal",
+					"control_size": "",
+					"command_name": "Placeholder2"
+				},
+				{
+					"command_url": "",
+					"button_text": "",
+					"command_icon": "",
+					"command_type": "group",
+					"group_type": "vertical",
+					"control_size": "lg",
+					"command_name": "Direction 2"
+				},
 				{
 					"command_url": "decoder_control.cgi?onestep=1&command=0",
-					"button_text": "Up",
-					"command_icon": "glyphicon glyphicon-circle-arrow-up"
-				}
-				,{
+					"button_text": "",
+					"command_icon": "glyphicon glyphicon-circle-arrow-up",
+					"command_type": "button",
+					"group_type": "normal",
+					"control_size": "",
+					"command_name": "Up"
+				},
+				{
+					"command_url": "",
+					"button_text": "",
+					"command_icon": "",
+					"command_type": "placeholder",
+					"group_type": "normal",
+					"control_size": "",
+					"command_name": "Placeholder 3"
+				},
+				{
 					"command_url": "decoder_control.cgi?onestep=1&command=2",
-					"button_text": "Down",
-					"command_icon": "glyphicon glyphicon-circle-arrow-down"
-				}
-				,{
-					"command_url": "decoder_control.cgi?onestep=1&command=4",
-					"button_text": "Left",
-					"command_icon": "glyphicon glyphicon-circle-arrow-left"
-				}
-				,{
+					"button_text": "",
+					"command_icon": "glyphicon glyphicon-circle-arrow-down",
+					"command_type": "button",
+					"group_type": "normal",
+					"control_size": "",
+					"command_name": "Down"
+				},
+				{
+					"command_url": "",
+					"button_text": "",
+					"command_icon": "",
+					"command_type": "group",
+					"group_type": "vertical",
+					"control_size": "lg",
+					"command_name": "Directions 3"
+				},
+				{
+					"command_url": "",
+					"button_text": "",
+					"command_icon": "",
+					"command_type": "placeholder",
+					"group_type": "normal",
+					"control_size": "",
+					"command_name": "Placeholder 4"
+				},
+				{
 					"command_url": "decoder_control.cgi?onestep=1&command=6",
-					"button_text": "Right",
-					"command_icon": "glyphicon glyphicon-circle-arrow-right"
-				}
-				,{
+					"button_text": "",
+					"command_icon": "glyphicon glyphicon-circle-arrow-right",
+					"command_type": "button",
+					"group_type": "normal",
+					"control_size": "",
+					"command_name": "Right"
+				},
+				{
+					"command_url": "",
+					"button_text": "",
+					"command_icon": "",
+					"command_type": "placeholder",
+					"group_type": "normal",
+					"control_size": "",
+					"command_name": "Placeholder 4"
+				},
+				{
+					"command_url": "",
+					"button_text": "",
+					"command_icon": "",
+					"command_type": "group",
+					"group_type": "normal",
+					"control_size": "",
+					"command_name": "IR Controls"
+				},
+				{
 					"command_url": "decoder_control.cgi?onestep=1&command=94",
 					"button_text": "IR On",
-					"command_icon": "glyphicon glyphicon-off"
-				}
-				,{
+					"command_icon": "glyphicon glyphicon-off",
+					"command_type": "button",
+					"group_type": "normal",
+					"control_size": "",
+					"command_name": "IR On"
+				},
+				{
 					"command_url": "decoder_control.cgi?onestep=1&command=95",
 					"button_text": "IR Off",
-					"command_icon": "glyphicon glyphicon-remove-circle"
-				}
-				,{
+					"command_icon": "glyphicon glyphicon-remove-circle",
+					"command_type": "button",
+					"group_type": "normal",
+					"control_size": "",
+					"command_name": "IR Off"
+				},
+				{
+					"command_url": "",
+					"button_text": "",
+					"command_icon": "",
+					"command_type": "group",
+					"group_type": "normal",
+					"control_size": "sm",
+					"command_name": "Brightness Controls"
+				},
+				{
 					"command_url": "camera_control.cgi?param=1&value=48",
 					"button_text": "+",
 					"command_icon": "glyphicon glyphicon-certificate",
 					"status_handler": "function(element, status_data, command, camera_info) {\r\n\tif(status_data.brightness) {\r\n\t\tvar new_value = Number(status_data.brightness) + 16;\r\n\t\t$(element).data('next-value', new_value);\r\n\t}\r\n}",
-					"before_command_handler": "function(element, command, camera_info) {\r\n\tvar new_value = $(element).data('next-value');\r\n\tvar result = {};\r\n\tresult['command_params'] = {\r\n\t\t\"param\": 1,\r\n\t\t\"value\": new_value\r\n\t};\r\n\treturn result;\r\n}"
-				}
-				,{
+					"before_command_handler": "function(element, command, camera_info) {\r\n\tvar new_value = $(element).data('next-value');\r\n\tvar result = {};\r\n\tresult['command_params'] = {\r\n\t\t\"param\": 1,\r\n\t\t\"value\": new_value\r\n\t};\r\n\treturn result;\r\n}",
+					"command_type": "button",
+					"group_type": "normal",
+					"control_size": "",
+					"command_name": "Brightness Up"
+				},
+				{
+					"command_url": "",
+					"button_text": "Brightness",
+					"command_icon": "",
+					"status_handler": "function(element, status_data, command, camera_info) {\r\n\tif(status_data.brightness) {\r\n\t\t$(element).find('.command-text').html(status_data.brightness);\r\n\t}\r\n}",
+					"command_type": "text",
+					"group_type": "normal",
+					"control_size": "",
+					"command_name": "Brightness Display"
+				},
+				{
 					"command_url": "camera_control.cgi?param=1&value=48",
 					"button_text": "-",
 					"command_icon": "glyphicon glyphicon-certificate",
 					"status_handler": "function(element, status_data, command, camera_info) {\r\n\tif(status_data.brightness) {\r\n\t\tvar new_value = Number(status_data.brightness) - 16;\r\n\t\tif(new_value < 0) {\r\n\t\t\t$(element).attr('disabled', 'disabled');\r\n \t\t}\r\n\t\telse {\r\n\t\t\t$(element).data('next-value', new_value);\r\n\t\t\t$(element).removeAttr('disabled', 'disabled');\r\n\t\t}\r\n\t}\r\n}",
-					"before_command_handler": "function(element, command, camera_info) {\r\n\tvar new_value = $(element).data('next-value');\r\n\tvar result = {};\r\n\tresult['command_params'] = {\r\n\t\t\"param\": 1,\r\n\t\t\"value\": new_value\r\n\t};\r\n\treturn result;\r\n}"
+					"before_command_handler": "function(element, command, camera_info) {\r\n\tvar new_value = $(element).data('next-value');\r\n\tvar result = {};\r\n\tresult['command_params'] = {\r\n\t\t\"param\": 1,\r\n\t\t\"value\": new_value\r\n\t};\r\n\treturn result;\r\n}",
+					"command_type": "button",
+					"group_type": "normal",
+					"control_size": "",
+					"command_name": "Brightness Down"
 				}
 			],
 			"status_handlers": [

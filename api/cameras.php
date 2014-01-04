@@ -69,6 +69,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 					'status_handler' => $_POST['status_handler'][$count],
 					'before_command_handler' => $_POST['before_command_handler'][$count],
 					'after_command_handler' => $_POST['after_command_handler'][$count],
+					'command_type' => $_POST['command_type'][$count],
+					'group_type' => $_POST['group_type'][$count],
+					'control_size' => $_POST['control_size'][$count],
+					'command_name' => $_POST['command_name'][$count],
 				));
 				$count++;
 			}

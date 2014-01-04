@@ -67,7 +67,7 @@
 			$info = $_SESSION[$info_session_key];
 		}
 
-		set_time_limit(0);
+		set_time_limit(10);
 		ignore_user_abort(false);
 		register_shutdown_function('stopScript', $_GET['camera_id']);
 
@@ -83,10 +83,11 @@
 		else {
 			if($info['type'] == 'MJPEG') {
 				ob_start();
-				$headers = get_headers($image_url);
+				/*$headers = get_headers($image_url);
 				foreach($headers as $header) {
 					header($header);
-				}
+				}*/
+				header('Content-type: multipart/x-mixed-replace;boundary='.$info['boundary']);
 				//readfile($image_url);
 				$f = fopen($image_url, 'rb');
 				$chunk = '';

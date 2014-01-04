@@ -44,7 +44,7 @@
 		      <span class="icon-bar"></span>
 		      <span class="icon-bar"></span>
 		    </button>
-		    <a class="navbar-brand" href="camera_list"> <span class="glyphicon glyphicon-eye-open"></span> IP Cams</a>
+		    <a class="navbar-brand" href="<?=BASE_URL?>camera_list"> <span class="glyphicon glyphicon-eye-open"></span> IP Cams</a>
 		  </div>
 
 		  <!-- Collect the nav links, forms, and other content for toggling -->

@@ -12,7 +12,7 @@
 					</div>
 				</h4>
 			</div>
-			<img src="" data-stream-url="{{image_url}}" data-snapshot-url="{{snapshot_url}}" class="img-thumbnail center-block camera-stream" id="active_camera_image" />
+			<img src="" data-stream-url="<?=BASE_URL?>{{image_url}}" data-snapshot-url="<?=BASE_URL?>{{snapshot_url}}" class="img-thumbnail center-block camera-stream" id="active_camera_image" />
 			<div class="img-thumbnail img-placeholder">
 				<div class="img-loading-text">Loading Camera...</div>
 				<div class="col-md-offset-2 col-md-8 progress progress-striped active">

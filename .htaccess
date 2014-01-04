@@ -1,7 +1,10 @@
-Options +FollowSymLinks
+Options -Indexes
 RewriteEngine on
 
+### if the is not a request for an existing file or directory
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 
-RewriteRule (.*) index.php?path=$1 [L]
+# rewrite to index.php passing the URI as a path, QSA will preserve the existing query string
+RewriteRule ^(.*)$ index.php?$1 [L,QSA]
+
